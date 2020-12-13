@@ -5,6 +5,8 @@
 #include "Process.h"
 #include <msclr\marshal_cppstd.h>
 
+#include "ShearParameters.h"
+
 namespace Form_Empty {
 
 	using namespace System;
@@ -171,13 +173,62 @@ namespace Form_Empty {
 			BYTE* buffer, * raw_intensity;
 			CString str = openFileDialog1->FileName;
 
+
+			////////////// this line started develop    
+
+			int displayFlag = 1;
+
 			//BMP image okuma 
 			buffer = LoadBMP(width, height, size, (LPCTSTR)str);
 			raw_intensity = ConvertBMPToIntensity(buffer, width, height);
 
+
+			const char* lpfilt = "maxflat";
+			ShearParameters shearParameters;
+			shearParameters.dcomp = new int[3, 3, 4, 4];
+			shearParameters.dsize = new int[32, 32, 16, 16];
+
+			int shearVersion = 0;			// nsst_dec1e
+			//int shear_version = 1;		// nsst_dec1
+			//int shear_version = 2;		// nsst_dec2
+
+			double** dst, shearF;
+
+			switch (shearVersion)
+			{
+			case 0:
+				//[dst, shear_f] = nsst_dec1e(x, shear_parameters, lpfilt);
+				break;
+
+			case 1:
+				//[dst, shear_f] = nsst_dec1(x, shear_parameters, lpfilt);
+				break;
+
+			case 2:
+				//[dst, shear_f] = nsst_dec2(x, shear_parameters, lpfilt);
+				break;
+			default:
+				break;
+			}
+			
 			Bitmap^ surface = gcnew Bitmap(width, height);
 			pictureBox2->Image = surface;
+			
+			/////////////////////  display coefficients - will complete
+			//
+			// DISPLAY
+			// 
+			/*if (displayFlag == 1) {
 
+			}*/
+			////////////////
+
+
+
+			/*
+			* FFT IMAGE PROCESS
+			*
+			*
 			// Daha sonra width * height 'luk resmin FFT'si aliniyor
 			double* Real_part = new double[width * height];
 			double* Im_part = new double[width * height];
@@ -229,17 +280,41 @@ namespace Form_Empty {
 					surface->SetPixel(col, row, c);
 				}
 
+			*/
+
+
+			double* xr;
+			switch (shearVersion)
+			{
+			case 0:
+				//   xr = nsst_rec1(dst, lpfilt);
+
+				break;
+
+			case 1:
+				//	xr = nsst_rec1(dst, lpfilt);
+				break;
+
+			case 2:
+				// xr = nsst_rec2(dst, shear_f, lpfilt);
+				break;
+			default:
+				break;
+			}
+
+
+
 			pictureBox2->Refresh();
 			pictureBox1->ImageLocation = openFileDialog1->FileName;
 			labelPath->Text = pictureBox1->ImageLocation;
 
 			delete[] buffer;
 			delete[] raw_intensity;
-			delete[] Real_part;
+			/*delete[] Real_part;
 			delete[] Im_part;
-			delete[] fourier255;
+			delete[] fourier255;*/
 			//delete[] fourier1;
-			delete[] image;
+			//delete[] image;
 		}
 	}
 	};
