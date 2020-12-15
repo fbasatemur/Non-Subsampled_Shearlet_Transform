@@ -33,6 +33,9 @@
     <ClCompile Include="MatlabFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="nsst_dec1e.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyForm.h">
@@ -61,6 +64,9 @@
     </ClInclude>
     <ClInclude Include="Atrousrec.cpp">
       <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="nsst_dec1e.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
