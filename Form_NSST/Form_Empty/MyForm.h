@@ -6,6 +6,7 @@
 #include <msclr\marshal_cppstd.h>
 
 #include "ShearParameters.h"
+#include "Dst.h"
 
 namespace Form_Empty {
 
@@ -178,7 +179,7 @@ namespace Form_Empty {
 
 			int displayFlag = 1;
 
-			//BMP image okuma 
+			 
 			buffer = LoadBMP(width, height, size, (LPCTSTR)str);
 			raw_intensity = ConvertBMPToIntensity(buffer, width, height);
 
@@ -192,7 +193,9 @@ namespace Form_Empty {
 			//int shear_version = 1;		// nsst_dec1
 			//int shear_version = 2;		// nsst_dec2
 
-			double** dst, shearF;
+
+			Dst dst(width, height, 5), shearF(width, height, 4);
+
 
 			switch (shearVersion)
 			{
@@ -288,7 +291,6 @@ namespace Form_Empty {
 			{
 			case 0:
 				//   xr = nsst_rec1(dst, lpfilt);
-
 				break;
 
 			case 1:

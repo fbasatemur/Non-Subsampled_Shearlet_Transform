@@ -30,6 +30,9 @@
     <ClCompile Include="NsstRec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="MatlabFuncs.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyForm.h">
@@ -49,6 +52,15 @@
     </ClInclude>
     <ClInclude Include="NsstRec.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MatlabFuncs.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Dst.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Atrousrec.cpp">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

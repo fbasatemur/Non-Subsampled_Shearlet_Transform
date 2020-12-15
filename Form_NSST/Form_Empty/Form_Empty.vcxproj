@@ -81,13 +81,17 @@
   <ItemGroup>
     <ClCompile Include="FFT.cpp" />
     <ClCompile Include="Image.cpp" />
+    <ClCompile Include="MatlabFuncs.cpp" />
     <ClCompile Include="MyForm.cpp" />
     <ClCompile Include="NsstRec.cpp" />
     <ClCompile Include="Process.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Atrousrec.cpp" />
+    <ClInclude Include="Dst.h" />
     <ClInclude Include="FFT.h" />
     <ClInclude Include="Image.h" />
+    <ClInclude Include="MatlabFuncs.h" />
     <ClInclude Include="MyForm.h">
       <FileType>CppForm</FileType>
     </ClInclude>

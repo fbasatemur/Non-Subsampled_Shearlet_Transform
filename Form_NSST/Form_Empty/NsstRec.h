@@ -1,5 +1,6 @@
 #pragma once
+#include "Dst.h"
 
-double* NsstRec1(double** dst, const char* lpfilt);
+double* NsstRec1(Dst* dst, const char* lpfilt);
 
 //double* NsstRec2();
