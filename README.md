@@ -8,5 +8,7 @@
 
 15/12 -- struct Dst
        - Sum & Eye Matlab Functions
+       
+16/12 -- Conv2 Matlab Function
 </pre>
 
