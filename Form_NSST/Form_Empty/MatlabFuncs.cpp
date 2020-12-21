@@ -1,3 +1,4 @@
+#include <string.h>		//for strcmp
 #include "MatlabFuncs.h"
 #include "Dst.h"
 
@@ -44,4 +45,66 @@ double* Eye(int size) {
 	}
 
 	return identityMat;
+}
+
+int max(int a, int b)
+{
+	return a >= b ? a : b;
+}
+
+double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type)
+{
+	double* outMat;
+	int outRow, outCol, edgeRows, edgeCols;
+
+	if (!strcmp(type, "full"))
+	{
+		outRow = imageRow + kernelRow - 1;
+		outCol = imageCol + kernelCol - 1;
+		edgeRows = kernelRow - 1;
+		edgeCols = kernelCol - 1;
+	}
+	else if (!strcmp(type, "same"))
+	{
+		outRow = imageRow;
+		outCol = imageCol;
+		edgeRows = (kernelRow - 1)/2;
+		edgeCols = (kernelCol - 1)/2;
+	}
+	else if (!strcmp(type, "valid"))
+	{
+		outRow = imageRow - kernelRow + 1;
+		outCol = imageCol - kernelCol + 1;
+		edgeRows = edgeCols = 0;	
+	}
+	else
+	{
+		return (double*)-1;
+	}
+	
+	outMat = new double[outRow * outCol];
+
+	int iImage, iKernel, jImage, jKernel;
+	double sum = 0;
+	for (int i = 0; i < outRow; i++)
+	{
+		for (int j = 0; j < outCol; j++)
+		{
+			sum = 0;
+
+			iKernel = kernelRow - 1 - max(0, edgeRows - i);
+			iImage = max(0, i - edgeRows);
+			for (; (iKernel>=0) && (iImage < imageRow); iKernel--, iImage++)
+			{
+				jKernel = kernelCol - 1 - max(0, edgeCols - j);
+				jImage = max(0, j - edgeCols);
+
+				for (; (jKernel >= 0) && (jImage < imageCol); jKernel--, jImage++)
+					sum += image[imageCol * iImage + jImage] * kernel[kernelCol * iKernel + jKernel];
+			}
+			outMat[i * outCol + j] = sum;
+		}
+	}
+
+	return outMat;
 }
