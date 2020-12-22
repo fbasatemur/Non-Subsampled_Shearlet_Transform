@@ -2,6 +2,8 @@
 #include "MatlabFuncs.h"
 #include "Dst.h"
 
+#define ERROR (double*)-1
+
 double* Sum(double* mat, int imageSize, int matDepth, int dim) {
 
 	double* retMat = new double[imageSize];
@@ -79,7 +81,7 @@ double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int ker
 	}
 	else
 	{
-		return (double*)-1;
+		return ERROR;
 	}
 	
 	outMat = new double[outRow * outCol];
@@ -107,4 +109,75 @@ double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int ker
 	}
 
 	return outMat;
+}
+
+double* Fliplr(const double* arry, int height, int width) {
+
+	double* returnBuffer = new double[width * height];
+	
+	for (int row = 0; row < height; row++)
+	{
+		for (int col = 0; col < width; col++)
+		{
+			returnBuffer[row * width + width - col - 1] = arry[row * width + col];
+		}
+	}
+
+	double returnBuffer;
+}
+
+double* Flipud(const double* arry, int height, int width) {
+
+	double* returnBuffer = new double[width * height];
+
+	for (int col = 0; col < width; col++)
+	{
+		for (int row = 0; row < height; row++)
+		{
+			returnBuffer[(height - row - 1) * width + col] = arry[row * width + col];
+		}
+	}
+
+	double returnBuffer;
+}
+
+double* MatrixExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W) {
+
+	if (mat1H != mat2H)
+		return ERROR;
+
+	int extWidth = mat1W + mat2W;
+	double* extMatrix = new double[mat1H * extWidth];
+
+	for (int row = 0; row < mat1H; row++)
+	{
+		for (int col = 0; col < mat1W; col++)
+		{
+			extMatrix[row * extWidth + col] = mat1[row * mat1W + col];
+		}
+
+		for (int col = mat1W - 1; col < extWidth; col++)
+		{
+			extMatrix[row * extWidth + col] = mat2[row * mat2W + col];
+		}
+	}
+
+	return extMatrix;
+}
+
+double* MatrixCut(const double* mat, int height, int width, int rowIndex1, int rowIndex2, int colIndex1, int colIndex2) {
+
+	int cutHeight = rowIndex2 - rowIndex1 + 1;
+	int cutWidth = colIndex2 - colIndex1 + 1;
+	double* cutMatrix = new double[cutHeight * cutWidth];
+
+	for (int row = rowIndex1; row <= rowIndex2; row++)
+	{
+		for (int col = colIndex1; col <= colIndex2; col++)
+		{
+			cutMatrix[row * cutWidth + col] = mat[row * width + col];
+		}
+	}
+
+	return cutMatrix;
 }
