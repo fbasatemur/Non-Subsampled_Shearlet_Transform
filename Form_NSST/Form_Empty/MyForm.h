@@ -186,8 +186,18 @@ namespace Form_Empty {
 
 			const char* lpfilt = "maxflat";
 			ShearParameters shearParameters;
-			shearParameters.dcomp = new int[3, 3, 4, 4];
-			shearParameters.dsize = new int[32, 32, 16, 16];
+
+			shearParameters.dcomp = new int[4];
+			shearParameters.dcomp[0] = 3;
+			shearParameters.dcomp[1] = 3;
+			shearParameters.dcomp[2] = 4;
+			shearParameters.dcomp[3] = 4;
+
+			shearParameters.dsize = new int[4];
+			shearParameters.dsize[0] = 32; 
+			shearParameters.dsize[1] = 32;
+			shearParameters.dsize[2] = 16;
+			shearParameters.dsize[3] = 16;
 
 			int shearVersion = 0;			// nsst_dec1e
 			//int shear_version = 1;		// nsst_dec1

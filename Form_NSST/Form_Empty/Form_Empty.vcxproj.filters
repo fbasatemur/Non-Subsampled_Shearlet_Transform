@@ -37,6 +37,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Cell.cpp">
+    <ClCompile Include="AtrousFilters.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
