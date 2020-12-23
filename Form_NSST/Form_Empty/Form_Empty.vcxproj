@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClInclude Include="Atrousrec.cpp" />
     <ClInclude Include="Cell.h" />
+    <ClInclude Include="Container.h" />
     <ClInclude Include="FFT.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="MatlabFuncs.h" />

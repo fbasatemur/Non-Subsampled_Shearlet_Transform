@@ -1,76 +1,73 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="MyForm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="FFT.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Process.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="NsstDec.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="NsstRec.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="MatlabFuncs.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NsstDec.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Process.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Cell.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
     <ClCompile Include="AtrousFilters.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="FFT.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MatlabFuncs.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="MyForm.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyForm.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClInclude Include="MyForm.h" />
     <ClInclude Include="FFT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Image.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Process.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShearParameters.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NsstRec.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MatlabFuncs.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Atrousrec.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NsstDec.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="Cell.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header</Filter>
     </ClInclude>
+    <ClInclude Include="Image.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="NsstDec.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="NsstRec.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Process.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="ShearParameters.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Atrousrec.cpp">
+      <Filter>Source</Filter>
+    </ClInclude>
+    <ClInclude Include="MatlabFuncs.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Container.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header">
+      <UniqueIdentifier>{d2e6f9d7-336b-48bf-b517-9181d79ac5b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source">
+      <UniqueIdentifier>{da7e72a2-65b4-4a47-bc19-b3253b545030}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

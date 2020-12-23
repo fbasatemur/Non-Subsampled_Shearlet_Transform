@@ -6,7 +6,7 @@
 #include <msclr\marshal_cppstd.h>
 
 #include "ShearParameters.h"
-#include "Cell.h"
+#include "Container.h"
 
 namespace Form_Empty {
 
@@ -205,7 +205,18 @@ namespace Form_Empty {
 
 
 			//Cell dst(width, height, 5), shearF(width, height, 4);
-			Cell* dst, * shearF;
+			Cont dst(5);
+			dst.mats[0].CreateMatrix(width, height, 1);
+			dst.mats[1].CreateMatrix(width, height, 1);
+			dst.mats[2].CreateMatrix(width, height, 1);
+			dst.mats[3].CreateMatrix(width, height, 1);
+			dst.mats[4].CreateMatrix(width, height, 1);
+
+			Cont shearF(4);
+			shearF.mats[0].CreateMatrix(width, height, 1);
+			shearF.mats[1].CreateMatrix(width, height, 1);
+			shearF.mats[2].CreateMatrix(width, height, 1);
+			shearF.mats[3].CreateMatrix(width, height, 1);
 
 
 			switch (shearVersion)

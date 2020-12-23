@@ -1,8 +1,9 @@
 #pragma once
 #include "Cell.h"
+#include "Container.h"
 
 // Sum defined only for dim = 3 
-double* Sum(double* mat, int imageSize, int matDepth, int dim);
+Matrix* Sum(Matrix* mat, int dim);
 
 double* Eye(int size);
 
@@ -16,6 +17,8 @@ double* Fliplr(const double* arry, int height, int width);
 
 double* Flipud(const double* arry, int height, int width);
 
-double* MatrixExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W);
+Matrix* MatrixColExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W);
 
-double* MatrixCut(const double* mat1, int mat1H, int mat1W, int rowIndex1, int rowIndex2, int colIndex1, int colIndex2);
+Matrix* MatrixRowExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W);
+
+Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, int rowEndIndex, int colStartIndex, int colEndIndex);

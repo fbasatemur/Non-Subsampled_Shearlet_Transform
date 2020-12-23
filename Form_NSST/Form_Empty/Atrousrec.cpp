@@ -1,28 +1,34 @@
 #pragma once
-#include "Dst.h"
+#include "Container.h"
 #include "MatlabFuncs.h"
+#include "AtrousFilters.cpp"
 #include <math.h>
 
-double* Atrousrec(Cell* y, const char* lpfilt) {
+double* Atrousrec(Cont* y, const char* lpfilt) {
 
-	int NLevels = y->matCount - 1;
-
-	double* h0, h1, g0, g1;
+	int NLevels = y->matNums - 1;
 	
-	// will repairing...		atrousfilters
+	
 	// [h0,h1,g0,g1] = atrousfilters(fname);
+	Matrix** ret = AtrousFilters(lpfilt);
+	Matrix* g0 = ret[0];
+	Matrix* h0 = ret[1];
+	Matrix* g1 = ret[2];
+	Matrix* h1 = ret[3];
+
 
 	double* x;
 	double* y1;
 
-	x = y->mats[0];
+	x = y->mats[0].mat;
+
 	double* I2 = Eye(2);
 	double* shift = new double[2]{ 1.0, 1.0 };
 	double L = 0.0;
 
 	for (int i = NLevels - 1; i >= 1; i--) {
 
-		y1 = y->mats[NLevels - i];			// Matlab: y{2} <=> C: y[1]
+		y1 = y->mats[NLevels - i].mat;			// Matlab: y{2} <=> C: y[1]
 		
 		shift[0] = -1 * pow(2, (i - 1)) * shift[0] + 2.0;
 		shift[1] = -1 * pow(2, (i - 1)) * shift[1] + 2.0;

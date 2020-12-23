@@ -11,10 +11,12 @@
        
 22/12 -- Conv2 Matlab Function 
 
-22/12 -- Fliplr, Flipud, Matrix Extend & Cut Matlab Functions and AtrousFilters (waiting for Matrix Class..)
+22/12 -- Fliplr, Flipud, Matrix Extend & Cut Matlab Functions and AtrousFilters
 
 23/12 -- class Cell
        - Conv2 overloading
        - scalar matrix multiplication (operator*)
+
+23/12 -- class Container
 </pre>
 

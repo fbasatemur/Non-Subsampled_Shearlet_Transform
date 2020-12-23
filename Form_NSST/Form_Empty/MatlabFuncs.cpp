@@ -3,9 +3,13 @@
 
 #define ERROR (double*)-1
 
-double* Sum(double* mat, int imageSize, int matDepth, int dim) {
+Matrix* Sum(Matrix* mat, int dim) {
 
-	double* retMat = new double[imageSize];
+	int imageSize = mat->GetSize();
+
+	Matrix* retMat = new Matrix;
+	retMat->CreateMatrix(mat->height, mat->width, 1);
+
 	double total = 0.0;
 
 	switch (dim)
@@ -18,9 +22,9 @@ double* Sum(double* mat, int imageSize, int matDepth, int dim) {
 		for (int i = 0; i < imageSize; i++) {
 
 			total = 0.0;
-			for (int d = 0; d < matDepth; d++)
-				total += mat[d * imageSize + i];
-			retMat[i] = total;
+			for (int d = 0; d < mat->depth; d++)
+				total += mat->mat[d * imageSize + i];
+			retMat->mat[i] = total;
 		}
 		
 		break;
@@ -180,7 +184,7 @@ double* Fliplr(const double* arry, int height, int width) {
 		}
 	}
 
-	double returnBuffer;
+	return returnBuffer;
 }
 
 double* Flipud(const double* arry, int height, int width) {
@@ -195,44 +199,69 @@ double* Flipud(const double* arry, int height, int width) {
 		}
 	}
 
-	double returnBuffer;
+	return returnBuffer;
 }
 
-double* MatrixExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W) {
-
-	if (mat1H != mat2H)
-		return ERROR;
+// mat1H and mat2H are must equie
+Matrix* MatrixColExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W) {
 
 	int extWidth = mat1W + mat2W;
-	double* extMatrix = new double[mat1H * extWidth];
+
+	Matrix* extMatrix = new Matrix;
+	extMatrix->CreateMatrix(mat1H, extWidth, 1);
 
 	for (int row = 0; row < mat1H; row++)
 	{
 		for (int col = 0; col < mat1W; col++)
 		{
-			extMatrix[row * extWidth + col] = mat1[row * mat1W + col];
+			extMatrix->mat[row * extWidth + col] = mat1[row * mat1W + col];
 		}
 
 		for (int col = mat1W - 1; col < extWidth; col++)
 		{
-			extMatrix[row * extWidth + col] = mat2[row * mat2W + col];
+			extMatrix->mat[row * extWidth + col] = mat2[row * mat2W + (col - (mat1W - 1))];
 		}
 	}
 
 	return extMatrix;
 }
 
-double* MatrixCut(const double* mat, int height, int width, int rowIndex1, int rowIndex2, int colIndex1, int colIndex2) {
+// mat1W and mat2W are must equie
+Matrix* MatrixRowExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W) {
 
-	int cutHeight = rowIndex2 - rowIndex1 + 1;
-	int cutWidth = colIndex2 - colIndex1 + 1;
-	double* cutMatrix = new double[cutHeight * cutWidth];
+	int extHeight = mat1H + mat2H;
 
-	for (int row = rowIndex1; row <= rowIndex2; row++)
+	Matrix* extMatrix = new Matrix;
+	extMatrix->CreateMatrix(extHeight, mat1W, 1);
+
+	for (int col = 0; col < mat1W; col++)
 	{
-		for (int col = colIndex1; col <= colIndex2; col++)
+		for (int row = 0; row < mat1H; row++)
 		{
-			cutMatrix[row * cutWidth + col] = mat[row * width + col];
+			extMatrix->mat[row * mat1W + col] = mat1[row * mat1W + col];
+		}
+		for (int row = mat1H - 1; row < extHeight; row++)
+		{
+			extMatrix->mat[row * mat1W + col] = mat2[(row - (mat1H - 1)) * mat1W + col];
+		}
+	}
+
+	return extMatrix;
+}
+
+Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, int rowEndIndex, int colStartIndex, int colEndIndex) {
+
+	int cutHeight = rowEndIndex - rowStartIndex + 1;
+	int cutWidth = colEndIndex - colStartIndex + 1;
+	
+	Matrix* cutMatrix = new Matrix;
+	cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
+
+	for (int row = rowStartIndex; row <= rowEndIndex; row++)
+	{
+		for (int col = colStartIndex; col <= colEndIndex; col++)
+		{
+			cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
 		}
 	}
 

@@ -1,7 +1,7 @@
 #include <stdlib.h> 
 #include "MatlabFuncs.h"
 
-void AtrousFilters(const char* fname) {
+Matrix** AtrousFilters(const char* fname) {
 
 	int h0Width = 7;
 	int h0Height = 7;
@@ -74,26 +74,58 @@ void AtrousFilters(const char* fname) {
 		0.017093222023136675 ,-0.023749819637010044 ,-0.12203257624594532               ,0.821896776039774 };
 
 
-		// Matrix sinifina gore duzenlenecek
-		double* cutG0 = MatrixCut(g0, g0Height, g0Width, 0, g0Height - 1, 0, g0Width - 2);
-		double* retG0 = MatrixExtend(g0, g0Height, g0Width, Fliplr(cutG0, g0Height, g0Width - 1), g0Height, g0Width - 1);
+		/*
+			g0 = [g0   fliplr(g0(:, 1 : end - 1))];
+			g0 = [g0; flipud(g0(1:end - 1, : ))];
+			h0 = [h0   fliplr(h0(:, 1 : end - 1))];
+			h0 = [h0; flipud(h0(1:end - 1, : ))];
+		
+			g1 = [g1   fliplr(g1(:, 1 : end - 1))];
+			g1 = [g1; flipud(g1(1:end - 1, : ))];
+			h1 = [h1   fliplr(h1(:, 1 : end - 1))];
+			h1 = [h1; flipud(h1(1:end - 1, : ))];
+		*/
 
+		// g0
+		Matrix* cutG0 = MatrixCut(g0, g0Height, g0Width, 0, g0Height - 1, 0, g0Width - 2);
+		Matrix* extG0 = MatrixColExtend(g0, g0Height, g0Width, Fliplr(cutG0->mat, cutG0->height, cutG0->width), cutG0->height, cutG0->width);
+		// g0
+		Matrix* cutExtG0 = MatrixCut(extG0->mat, extG0->height, extG0->width, 0, extG0->height - 2, 0, extG0->width - 1);
+		Matrix* retG0 = MatrixRowExtend(extG0->mat, extG0->height, extG0->width, Flipud(cutExtG0->mat, cutExtG0->height, cutExtG0->width), cutExtG0->height, cutExtG0->width);
+		// h0
+		Matrix* cutH0 = MatrixCut(h0, h0Height, h0Width, 0, h0Height - 1, 0, h0Width - 2);
+		Matrix* extH0 = MatrixColExtend(h0, h0Height, h0Width, Fliplr(cutH0->mat, cutH0->height, cutH0->width), cutH0->height, cutH0->width);
+		// h0
+		Matrix* cutExtH0 = MatrixCut(extH0->mat, extH0->height, extH0->width, 0, extH0->height - 2, 0, extH0->width - 1);
+		Matrix* retH0 = MatrixRowExtend(extH0->mat, extH0->height, extH0->width, Flipud(cutExtH0->mat, cutExtH0->height, cutExtH0->width), cutExtH0->height, cutExtH0->width);
+		
+		// g1
+		Matrix* cutG1 = MatrixCut(g1, g1Height, g1Width, 0, g1Height - 1, 0, g1Width - 2);
+		Matrix* extG1 = MatrixColExtend(g1, g1Height, g1Width, Fliplr(cutG1->mat, cutG1->height, cutG1->width), cutG1->height, cutG1->width);
+		// g1
+		Matrix* cutExtG1 = MatrixCut(extG1->mat, extG1->height, extG1->width, 0, extG1->height - 2, 0, extG1->width - 1);
+		Matrix* retG1 = MatrixRowExtend(extG1->mat, extG1->height, extG1->width, Flipud(cutExtG1->mat, cutExtG1->height, cutExtG1->width), cutExtG1->height, cutExtG1->width);
+		// h1
+		Matrix* cutH1 = MatrixCut(h1, h1Height, h1Width, 0, h1Height - 1, 0, h1Width - 2);
+		Matrix* extH1 = MatrixColExtend(h1, h1Height, h1Width, Fliplr(cutH1->mat, cutH1->height, cutH1->width), cutH1->height, cutH1->width);
+		// h1
+		Matrix* cutExtH1 = MatrixCut(extH1->mat, extH1->height, extH1->width, 0, extH1->height - 2, 0, extH1->width - 1);
+		Matrix* retH1 = MatrixRowExtend(extH1->mat, extH1->height, extH1->width, Flipud(cutExtH1->mat, cutExtH1->height, cutExtH1->width), cutExtH1->height, cutExtH1->width);
+	
+	
+		Matrix** ret = new Matrix*[4];
+		ret[0] = retG0;
+		ret[1] = retH0;
+		ret[2] = retG1;
+		ret[3] = retH1;
 
-
+		return ret;
 	}
 
 }
 
 
 
-//g0 = [g0   fliplr(g0(:, 1 : end - 1))];
-//g0 = [g0; flipud(g0(1:end - 1, : ))];
-//h0 = [h0   fliplr(h0(:, 1 : end - 1))];
-//h0 = [h0; flipud(h0(1:end - 1, : ))];
-//
-//g1 = [g1   fliplr(g1(:, 1 : end - 1))];
-//g1 = [g1; flipud(g1(1:end - 1, : ))];
-//h1 = [h1   fliplr(h1(:, 1 : end - 1))];
-//h1 = [h1; flipud(h1(1:end - 1, : ))];
+
 
 

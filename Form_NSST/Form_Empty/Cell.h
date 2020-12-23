@@ -1,8 +1,6 @@
 #pragma once
-#include "Matrix.h"
-class Cell {
 
-public:
+class Cell {
 
 public:
 	double* matx;
