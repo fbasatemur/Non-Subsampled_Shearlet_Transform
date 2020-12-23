@@ -33,7 +33,10 @@
     <ClCompile Include="MatlabFuncs.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="nsst_dec1e.cpp">
+    <ClCompile Include="NsstDec.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,13 +62,13 @@
     <ClInclude Include="MatlabFuncs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Dst.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Atrousrec.cpp">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="nsst_dec1e.h">
+    <ClInclude Include="NsstDec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -3,7 +3,7 @@
 #include "MatlabFuncs.h"
 #include <math.h>
 
-double* Atrousrec(Dst* y, const char* lpfilt) {
+double* Atrousrec(Cell* y, const char* lpfilt) {
 
 	int NLevels = y->matCount - 1;
 

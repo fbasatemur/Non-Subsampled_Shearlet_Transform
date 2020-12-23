@@ -79,17 +79,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="FFT.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="MatlabFuncs.cpp" />
     <ClCompile Include="MyForm.cpp" />
     <ClCompile Include="NsstRec.cpp" />
-    <ClCompile Include="nsst_dec1e.cpp" />
+    <ClCompile Include="NsstDec.cpp" />
     <ClCompile Include="Process.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Atrousrec.cpp" />
-    <ClInclude Include="Dst.h" />
+    <ClInclude Include="Cell.h" />
     <ClInclude Include="FFT.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="MatlabFuncs.h" />
@@ -97,7 +98,7 @@
       <FileType>CppForm</FileType>
     </ClInclude>
     <ClInclude Include="NsstRec.h" />
-    <ClInclude Include="nsst_dec1e.h" />
+    <ClInclude Include="NsstDec.h" />
     <ClInclude Include="Process.h" />
     <ClInclude Include="ShearParameters.h" />
   </ItemGroup>

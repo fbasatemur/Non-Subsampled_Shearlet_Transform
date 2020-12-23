@@ -6,7 +6,7 @@
 #include <msclr\marshal_cppstd.h>
 
 #include "ShearParameters.h"
-#include "Dst.h"
+#include "Cell.h"
 
 namespace Form_Empty {
 
@@ -194,7 +194,8 @@ namespace Form_Empty {
 			//int shear_version = 2;		// nsst_dec2
 
 
-			Dst dst(width, height, 5), shearF(width, height, 4);
+			//Cell dst(width, height, 5), shearF(width, height, 4);
+			Cell* dst, * shearF;
 
 
 			switch (shearVersion)

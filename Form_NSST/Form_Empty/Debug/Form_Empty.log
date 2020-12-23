@@ -1,0 +1,7 @@
+﻿  NsstRec.cpp
+  NsstDec.cpp
+C:\Users\batuhan\Desktop\NSST_Repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.h(9,5): error C2062: type 'int' unexpected
+C:\Users\batuhan\Desktop\NSST_Repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.h(9,5): error C2059: syntax error: ')'
+C:\Users\batuhan\Desktop\NSST_Repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\NsstDec.cpp(20,11): error C2065: 'y': undeclared identifier
+C:\Users\batuhan\Desktop\NSST_Repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\NsstDec.cpp(29,28): error C2065: 'y': undeclared identifier
+  Generating Code...
