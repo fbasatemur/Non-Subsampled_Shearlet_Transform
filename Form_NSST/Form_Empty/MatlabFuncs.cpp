@@ -1,6 +1,5 @@
 #include <string.h>		//for strcmp
 #include "MatlabFuncs.h"
-#include "Dst.h"
 
 double* Sum(double* mat, int imageSize, int matDepth, int dim) {
 
@@ -52,7 +51,7 @@ int max(int a, int b)
 	return a >= b ? a : b;
 }
 
-double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type)
+double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type = "same")
 {
 	double* outMat;
 	int outRow, outCol, edgeRows, edgeCols;
@@ -101,6 +100,63 @@ double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int ker
 
 				for (; (jKernel >= 0) && (jImage < imageCol); jKernel--, jImage++)
 					sum += image[imageCol * iImage + jImage] * kernel[kernelCol * iKernel + jKernel];
+			}
+			outMat[i * outCol + j] = sum;
+		}
+	}
+
+	return outMat;
+}
+
+double* Conv2(Cell image, Cell kernel, char* type)
+{
+	double* outMat;
+	int outRow, outCol, edgeRows, edgeCols;
+
+	if (!strcmp(type, "full"))
+	{
+		outRow = image.rows + kernel.rows - 1;
+		outCol = image.cols + kernel.cols - 1;
+		edgeRows = kernel.rows - 1;
+		edgeCols = kernel.cols - 1;
+	}
+	else if (!strcmp(type, "same"))
+	{
+		outRow = image.rows;
+		outCol = image.cols;
+		edgeRows = (kernel.rows - 1) / 2;
+		edgeCols = (kernel.cols - 1) / 2;
+	}
+	else if (!strcmp(type, "valid"))
+	{
+		outRow = image.rows - kernel.rows + 1;
+		outCol = image.cols - kernel.cols + 1;
+		edgeRows = edgeCols = 0;
+	}
+	else
+	{
+		return (double*)-1;
+	}
+
+	outMat = new double[outRow * outCol];
+
+	int iImage, iKernel, jImage, jKernel;
+	double sum = 0;
+	for (int i = 0; i < outRow; i++)
+	{
+		for (int j = 0; j < outCol; j++)
+		{
+			sum = 0;
+
+			iKernel = kernel.rows - 1 - max(0, edgeRows - i);
+			iImage = max(0, i - edgeRows);
+			for (; (iKernel >= 0) && (iImage < image.rows); iKernel--, iImage++)
+			{
+				jKernel = kernel.cols - 1 - max(0, edgeCols - j);
+				jImage = max(0, j - edgeCols);
+
+				for (; (jKernel >= 0) && (jImage < image.cols); jKernel--, jImage++)
+					sum += image.matx[image.cols * iImage + jImage] * kernel.matx[kernel.cols * iKernel + jKernel];
 			}
 			outMat[i * outCol + j] = sum;
 		}
