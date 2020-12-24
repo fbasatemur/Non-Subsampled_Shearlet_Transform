@@ -1,7 +1,8 @@
 #include <stdlib.h> 
 #include "MatlabFuncs.h"
 
-Matrix** AtrousFilters(const char* fname) {
+// return g0, h0, g1, h1
+Cont* AtrousFilters(const char* fname) {
 
 	int h0Width = 7;
 	int h0Height = 7;
@@ -112,12 +113,11 @@ Matrix** AtrousFilters(const char* fname) {
 		Matrix* cutExtH1 = MatrixCut(extH1->mat, extH1->height, extH1->width, 0, extH1->height - 2, 0, extH1->width - 1);
 		Matrix* retH1 = MatrixRowExtend(extH1->mat, extH1->height, extH1->width, Flipud(cutExtH1->mat, cutExtH1->height, cutExtH1->width), cutExtH1->height, cutExtH1->width);
 	
-	
-		Matrix** ret = new Matrix*[4];
-		ret[0] = retG0;
-		ret[1] = retH0;
-		ret[2] = retG1;
-		ret[3] = retH1;
+		Cont* ret = new Cont(4);
+		ret->mats[0] = retG0;
+		ret->mats[1] = retH0;
+		ret->mats[2] = retG1;
+		ret->mats[3] = retH1;
 
 		return ret;
 	}

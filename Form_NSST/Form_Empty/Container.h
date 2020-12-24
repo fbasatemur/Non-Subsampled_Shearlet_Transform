@@ -23,20 +23,26 @@ struct Matrix {
 class Cont {
 
 public:
-	Matrix* mats;
+	Matrix** mats;
 	int matNums;
 
 	Cont(int cellNums) {
 		this->matNums = cellNums;
-		mats = new Matrix[cellNums];
+		mats = new Matrix*[cellNums];
+	}
+
+	void CreateCells() {
+		for (int i = 0; i < matNums; i++)
+		{
+			mats[i] = new Matrix;
+		}
 	}
 
 	~Cont(){
 
 		for (int i = 0; i < matNums; i++)
-			delete[] mats[i].mat;
+			delete[] mats[i];
 
 		delete[] mats;
 	}
-
 };
