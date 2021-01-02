@@ -18,5 +18,7 @@
        - scalar matrix multiplication (operator*)
 
 23/12 -- class Container
+
+02/01 -- Upsample2df, Windowing, MeyerWind 
 </pre>
 
