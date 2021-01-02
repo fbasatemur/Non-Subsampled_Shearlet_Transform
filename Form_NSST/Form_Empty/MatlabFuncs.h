@@ -11,7 +11,6 @@ double* ones(int width, int height);
 double* zeros(int width, int height);
 double* zeros(int width, int height, int depth);
 
-
 Matrix* Conv2(Matrix* image, Matrix* kernel, char* type);
 Matrix* Conv2(Matrix* image, Matrix kernel, char* type);
 double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type);
@@ -25,5 +24,12 @@ Matrix* MatrixColExtend(double* mat1, int mat1H, int mat1W, double* mat2, int ma
 Matrix* MatrixRowExtend(double* mat1, int mat1H, int mat1W, double* mat2, int mat2H, int mat2W);
 
 Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, int rowEndIndex, int colStartIndex, int colEndIndex);
+
 Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, int rowEndIndex, int colStartIndex, int colEndIndex, int rowStep, int colStep);
+
+Matrix* Upsample2df(const Matrix* mat, int power);
+
+Matrix* Windowing(double* x, int lenghtX, int L);
+
+double MeyerWind(double x);
 
