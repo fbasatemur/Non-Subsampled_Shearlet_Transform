@@ -20,5 +20,8 @@
 23/12 -- class Container
 
 02/01 -- Upsample2df, Windowing, MeyerWind 
+
+02/01 -- symext, ShearingFiltersMyer, AtrousDec
+      -- ones, zeros Matlab Funtions
 </pre>
 
