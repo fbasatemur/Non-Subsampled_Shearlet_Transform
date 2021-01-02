@@ -1,13 +1,13 @@
 #pragma once
 #include "Container.h"
 #include "MatlabFuncs.h"
-#include "AtrousFilters.cpp"
+#include "AtrousFilters.h"
 #include <math.h>
 
 double* Atrousrec(Cont* y, const char* lpfilt) {
 
 	int NLevels = y->matNums - 1;
-	
+
 	
 	// [g0, h0, g1, h1] = atrousfilters(fname);
 	Cont* ret = AtrousFilters(lpfilt);

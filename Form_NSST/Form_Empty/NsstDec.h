@@ -1,5 +1,6 @@
 #pragma once
 #include "ShearParameters.h"
 #include <Windows.h>
+#include "Container.h"
 
-int* NsstDec1e(BYTE* image, int width, int height, struct ShearParameters shearParam, char* laplacianPyramidFilter, int* shearFilters);
+Cont* NsstDec1e(Matrix* image, struct ShearParameters shearParam, const char* lpfilt);

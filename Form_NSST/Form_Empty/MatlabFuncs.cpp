@@ -52,9 +52,28 @@ double* Eye(int size) {
 	return identityMat;
 }
 
-int max(int a, int b)
+double* ones(int width, int height)
 {
-	return a >= b ? a : b;
+	double* onesMat = new double[width * height];
+	memset(onesMat, 1.0, height * width * sizeof(double));
+
+	return onesMat;
+}
+
+double* zeros(int width, int height)
+{
+	double* zerosMat = new double[width * height];
+	memset(zerosMat, 0.0, height * width * sizeof(double));
+
+	return zerosMat;
+}
+
+double* zeros(int width, int height, int depth)
+{
+	double* zerosMat = new double[width * height * depth];
+	memset(zerosMat, 0.0, height * width * depth * sizeof(double));
+
+	return zerosMat;
 }
 
 double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type = "same")
@@ -84,7 +103,7 @@ double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int ker
 	}
 	else
 	{
-		return ERROR;
+		return (double*)-1;
 	}
 	
 	outMat = new double[outRow * outCol];
@@ -115,38 +134,37 @@ double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int ker
 }
 
 
-double* Conv2(Cell image, Cell kernel, char* type)
+Matrix* Conv2(Matrix* image, Matrix* kernel, char* type = "same")
 {
-	double* outMat;
 	int outRow, outCol, edgeRows, edgeCols;
 
 	if (!strcmp(type, "full"))
-	{
-		outRow = image.rows + kernel.rows - 1;
-		outCol = image.cols + kernel.cols - 1;
-		edgeRows = kernel.rows - 1;
-		edgeCols = kernel.cols - 1;
+	{	
+		outRow = image->height+ kernel->height - 1;
+		outCol = image->width + kernel->width - 1;
+		edgeRows = kernel->height - 1;
+		edgeCols = kernel->width - 1;
 	}
 	else if (!strcmp(type, "same"))
 	{
-		outRow = image.rows;
-		outCol = image.cols;
-		edgeRows = (kernel.rows - 1) / 2;
-		edgeCols = (kernel.cols - 1) / 2;
+		outRow = image->height;
+		outCol = image->width;
+		edgeRows = (kernel->height - 1) / 2;
+		edgeCols = (kernel->width - 1) / 2;
 	}
 	else if (!strcmp(type, "valid"))
 	{
-		outRow = image.rows - kernel.rows + 1;
-		outCol = image.cols - kernel.cols + 1;
+		outRow = image->height - kernel->height + 1;
+		outCol = image->width - kernel->width + 1;
 		edgeRows = edgeCols = 0;
 	}
 	else
 	{
-		return (double*)-1;
+		return (Matrix*)-1;
 	}
-
-	outMat = new double[outRow * outCol];
-
+	
+	Matrix* outMat = new Matrix;
+	outMat->CreateMatrix(outRow, outCol);
 	int iImage, iKernel, jImage, jKernel;
 	double sum = 0;
 	for (int i = 0; i < outRow; i++)
@@ -155,20 +173,74 @@ double* Conv2(Cell image, Cell kernel, char* type)
 		{
 			sum = 0;
 
-			iKernel = kernel.rows - 1 - max(0, edgeRows - i);
+			iKernel = kernel->height - 1 - max(0, edgeRows - i);
 			iImage = max(0, i - edgeRows);
-			for (; (iKernel >= 0) && (iImage < image.rows); iKernel--, iImage++)
+			for (; (iKernel >= 0) && (iImage < image->height); iKernel--, iImage++)
 			{
-				jKernel = kernel.cols - 1 - max(0, edgeCols - j);
+				jKernel = kernel->width - 1 - max(0, edgeCols - j);
 				jImage = max(0, j - edgeCols);
 
-				for (; (jKernel >= 0) && (jImage < image.cols); jKernel--, jImage++)
-					sum += image.matx[image.cols * iImage + jImage] * kernel.matx[kernel.cols * iKernel + jKernel];
+				for (; (jKernel >= 0) && (jImage < image->width); jKernel--, jImage++)
+					sum += image->mat[image->width * iImage + jImage] * kernel->mat[kernel->width * iKernel + jKernel];
 			}
-			outMat[i * outCol + j] = sum;
+			outMat->mat[i * outCol + j] = sum;
 		}
 	}
+	return outMat;
+}
 
+Matrix* Conv2(Matrix* image, Matrix kernel, char* type = "same")
+{
+	int outRow, outCol, edgeRows, edgeCols;
+
+	if (!strcmp(type, "full"))
+	{
+		outRow = image->height + kernel.height - 1;
+		outCol = image->width + kernel.width - 1;
+		edgeRows = kernel.height - 1;
+		edgeCols = kernel.width - 1;
+	}
+	else if (!strcmp(type, "same"))
+	{
+		outRow = image->height;
+		outCol = image->width;
+		edgeRows = (kernel.height - 1) / 2;
+		edgeCols = (kernel.width - 1) / 2;
+	}
+	else if (!strcmp(type, "valid"))
+	{
+		outRow = image->height - kernel.height + 1;
+		outCol = image->width - kernel.width + 1;
+		edgeRows = edgeCols = 0;
+	}
+	else
+	{
+		return (Matrix*)-1;
+	}
+
+	Matrix* outMat = new Matrix;
+	outMat->CreateMatrix(outRow, outCol);
+	int iImage, iKernel, jImage, jKernel;
+	double sum = 0;
+	for (int i = 0; i < outRow; i++)
+	{
+		for (int j = 0; j < outCol; j++)
+		{
+			sum = 0;
+
+			iKernel = kernel.height - 1 - max(0, edgeRows - i);
+			iImage = max(0, i - edgeRows);
+			for (; (iKernel >= 0) && (iImage < image->height); iKernel--, iImage++)
+			{
+				jKernel = kernel.width - 1 - max(0, edgeCols - j);
+				jImage = max(0, j - edgeCols);
+
+				for (; (jKernel >= 0) && (jImage < image->width); jKernel--, jImage++)
+					sum += image->mat[image->width * iImage + jImage] * kernel.mat[kernel.width * iKernel + jKernel];
+			}
+			outMat->mat[i * outCol + j] = sum;
+		}
+	}
 	return outMat;
 }
 
@@ -267,3 +339,48 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 
 	return cutMatrix;
 }
+
+Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, int rowEndIndex, int colStartIndex, int colEndIndex, int rowStep, int colStep) {
+
+	int cutHeight, cutWidth;
+	Matrix* cutMatrix = new Matrix;
+
+	//-,-
+	if ((rowStep < 0 && rowStartIndex > rowEndIndex) && (colStep < 0 && colStartIndex > colEndIndex)) {
+		cutHeight = rowStartIndex - rowEndIndex + 1;
+		cutWidth = colStartIndex - colEndIndex + 1;
+		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
+		for (int row = rowStartIndex; row >= rowEndIndex; row += rowStep)
+			for (int col = colStartIndex; col >= colEndIndex; col += colStep)
+				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+	}
+	//-,+
+	else if ((rowStep < 0 && rowStartIndex > rowEndIndex) && (colStep > 0 && colStartIndex < colEndIndex)) {
+		cutHeight = rowStartIndex - rowEndIndex + 1;
+		cutWidth = colEndIndex - colStartIndex + 1;
+		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
+		for (int row = rowStartIndex; row >= rowEndIndex; row += rowStep)
+			for (int col = colStartIndex; col <= colEndIndex; col += colStep)
+				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+	}
+	//+,-
+	else if ((rowStep > 0 && rowStartIndex < rowEndIndex) && (colStep < 0 && colStartIndex > colEndIndex)) {
+		cutHeight = rowEndIndex - rowStartIndex + 1;
+		cutWidth = colStartIndex - colEndIndex + 1;
+		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
+		for (int row = rowStartIndex; row <= rowEndIndex; row += rowStep)
+			for (int col = colStartIndex; col >= colEndIndex; col += colStep)
+				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+	}
+	//+,+
+	else if ((rowStep > 0 && rowStartIndex < rowEndIndex) && (colStep > 0 && colStartIndex < colEndIndex)){
+		cutHeight = rowEndIndex - rowStartIndex + 1;
+		cutWidth = colEndIndex - colStartIndex + 1;
+		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
+		for (int row = rowStartIndex; row <= rowEndIndex; row += rowStep)
+			for (int col = colStartIndex; col <= colEndIndex; col += colStep)
+				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+	}
+	return cutMatrix;
+}
+

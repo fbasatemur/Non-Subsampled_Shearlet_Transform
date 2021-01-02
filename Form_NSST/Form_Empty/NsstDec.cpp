@@ -1,29 +1,33 @@
 #pragma once
-#include <Windows.h>
-#include "ShearParameters.h"
 #include <math.h>
 #include "NsstDec.h"
-#include "Cell.h"
 #include "MatlabFuncs.h"
+#include "AtrousDec.h"
+#include "ShearingFiltersMyer.h"
 
-int* NsstDec1e(BYTE* image, int width, int height, struct ShearParameters shearParam, char* laplacianPyramidFilter, int* shearFilters)
+Cont* NsstDec1e(Matrix* image, struct ShearParameters shearParam, const char* lpfilt)
 {
 	int level = strlen((char*)shearParam.dcomp);
 	
 	//Laplacian Pyramid decomposition
-	//Cell* y = AtrousDec(image, laplacianPyramidFilter, level);
+	Cont* y = AtrousDec(image, lpfilt, level);
 
-	Cell* dst = newCell(level + 1);
-	dst[0] = y[0];
+	Cont* dst = new Cont(level + 1);
+	dst->mats[0] = y->mats[0];
 
-	Cell* shearF = newCell(level);
-	
+	Cont* shearF = new Cont(level);
+
+	Matrix* temp;
 	for (int i = 0; i < level; i++)
 	{
-		//shearF[i].matx = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]) * sqrt(shearParam.dsize[i]);
-		
-		for (int j = 0; j < pow(2, shearParam.dcomp[i]); j++)
-			dst[i + 1].matx = Conv2(y[i + 1], shearF[i]);
+		temp = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]);
+		for (int j = 0; j < temp->GetSize(); j++)
+			temp->mat[j] *= sqrt(shearParam.dsize[i]);
+		shearF->mats[i] = temp;
+
+		for (int k = 0; k < pow(2, shearParam.dcomp[i]); k++)
+			dst->mats[i + 1] = Conv2(y->mats[i+1], shearF->mats[i][k], "same");
 	}
 	
+	return dst;
 }

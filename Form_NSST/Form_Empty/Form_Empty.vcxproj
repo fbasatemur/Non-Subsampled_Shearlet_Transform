@@ -79,7 +79,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Cell.cpp" />
+    <ClCompile Include="AtrousDec.cpp" />
     <ClCompile Include="AtrousFilters.cpp" />
     <ClCompile Include="FFT.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -88,10 +88,13 @@
     <ClCompile Include="NsstDec.cpp" />
     <ClCompile Include="NsstRec.cpp" />
     <ClCompile Include="Process.cpp" />
+    <ClCompile Include="ShearingFiltersMyer.cpp" />
+    <ClCompile Include="symext.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AtrousDec.h" />
+    <ClInclude Include="AtrousFilters.h" />
     <ClInclude Include="Atrousrec.cpp" />
-    <ClInclude Include="Cell.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="FFT.h" />
     <ClInclude Include="Image.h" />
@@ -102,7 +105,9 @@
     <ClInclude Include="NsstDec.h" />
     <ClInclude Include="NsstRec.h" />
     <ClInclude Include="Process.h" />
+    <ClInclude Include="ShearingFiltersMyer.h" />
     <ClInclude Include="ShearParameters.h" />
+    <ClInclude Include="symext.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="MyForm.resx">

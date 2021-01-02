@@ -1,0 +1,2 @@
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\Debug\Form_Empty.MyForm.resources
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\Debug\Form_Empty.vcxproj.GenerateResource.cache

@@ -204,7 +204,6 @@ namespace Form_Empty {
 			//int shear_version = 2;		// nsst_dec2
 
 
-			//Cell dst(width, height, 5), shearF(width, height, 4);
 			Cont* dst = new Cont(5);
 			dst->CreateCells();
 			dst->mats[0]->CreateMatrix(width, height, 1);
