@@ -1,6 +1,8 @@
 #include <string.h>		//for strcmp
 #include "MatlabFuncs.h"
+#include <cmath>
 
+# define PI           3.14159265358979323846
 #define ERROR (double*)-1
 
 Matrix* Sum(Matrix* mat, int dim) {
@@ -266,4 +268,82 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 	}
 
 	return cutMatrix;
+}
+
+Matrix* Upsample2df(const Matrix* h, int power) {
+
+	int height = pow(2, power) * h->height;
+	int width = pow(2, power) * h->width;
+
+	Matrix* ho = new Matrix;
+	ho->CreateMatrix(height, width, 1);
+
+	int step = pow(2, power);
+	int hStep = 0;
+
+	for (int row = 0; row < height; row+= step)
+	{
+		for (int col = 0; col < width; col+= step)
+		{
+			ho->mat[row * ho->width + col] = h->mat[hStep];
+			hStep++;
+		}
+	}
+
+	return ho;
+}
+
+Matrix* Windowing(double* x, int lenghtX, int L) {
+
+	int N = lenghtX;
+	
+	Matrix* y = new Matrix;
+	y->height = N;
+	y->width = L;
+	y->depth = 1;
+	y->mat = zeros(L, N);
+
+	int T = N / L;
+	double* g = zeros(2 * T, 1);
+
+	int n = 0;
+	for (int j = 0; j < 2 * T; j++)
+	{
+		n = -1 * T / 2 + j;
+		g[j] = MeyerWind(n / T);
+	}
+
+	int index = 0;
+	for (int j = 0; j < L; j++)
+	{
+		index = 0;
+		for (int k = -1 * T / 2; k <= 1.5 * T - 1; k++)
+		{
+			double a = (int)(k + j * T) % N;
+			int in_sig = floor(a);
+			y->mat[in_sig * y->width + j] = g[index] * x[in_sig];
+			index++;
+		}
+	}
+
+}
+
+double MeyerWind(double x) {
+
+	double y = 0.0;
+	
+	if ((- 1 / 3 + 1 / 2 < x) && (x < 1 / 3 + 1 / 2))
+		y = 1.0;
+
+	else if (((1 / 3 + 1 / 2 <= x) && (x <= 2 / 3 + 1 / 2)) || ((-2 / 3 + 1 / 2 <= x) && (x <= 1 / 3 + 1 / 2))) {
+
+		double w = 3 * abs(x - 1 / 2) - 1;
+		double z = pow(w, 4) * (35 - 84 * w + 70 * pow(w, 2) - 20 * pow(w, 3));
+		y = pow(cos(PI / 2 * (z)), 2);
+	}
+
+	else
+		y = 0.0;
+
+	return y;
 }

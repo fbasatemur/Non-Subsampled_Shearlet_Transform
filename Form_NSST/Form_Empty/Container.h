@@ -1,7 +1,9 @@
 #pragma once
+#include <stdlib.h>
 
-struct Matrix {
+class Matrix {
 
+public:
 	int height;
 	int width;
 	int depth;
@@ -13,10 +15,15 @@ struct Matrix {
 		this->height = height;
 		this->width = width;
 		this->depth = depth;
-		mat = new double[height * width * depth];
+		mat = (double*)calloc(height * width * depth, sizeof(double));
 	}
 
 	int GetSize() { return height * width; }
+
+	double operator()(int row, int col) {
+		return this->mat[row * width + col];
+	}
+	
 };
 
 // Cont -> Container class
