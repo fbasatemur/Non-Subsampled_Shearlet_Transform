@@ -23,5 +23,7 @@
 
 02/01 -- symext, ShearingFiltersMyer, AtrousDec
       -- ones, zeros Matlab Funtions
+      
+05/01 -- GenXYCoordinates, RecFromPol, AvgPol, Linspace
 </pre>
 
