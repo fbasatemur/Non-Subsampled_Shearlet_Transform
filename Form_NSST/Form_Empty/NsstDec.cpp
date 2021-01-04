@@ -1,9 +1,9 @@
 #pragma once
 #include <math.h>
+#include <Windows.h>
 #include "NsstDec.h"
 #include "MatlabFuncs.h"
 #include "AtrousDec.h"
-#include "ShearingFiltersMyer.h"
 
 Cont* NsstDec1e(Matrix* image, struct ShearParameters shearParam, const char* lpfilt)
 {
