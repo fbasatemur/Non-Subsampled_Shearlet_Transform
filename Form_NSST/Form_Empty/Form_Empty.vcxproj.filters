@@ -25,13 +25,10 @@
     <ClCompile Include="MyForm.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="symext.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="AtrousDec.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="ShearingFiltersMyer.cpp">
+    <ClCompile Include="Atrousc.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -64,16 +61,13 @@
     <ClInclude Include="Container.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="symext.h">
-      <Filter>Header</Filter>
-    </ClInclude>
     <ClInclude Include="AtrousDec.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="ShearingFiltersMyer.h">
+    <ClInclude Include="AtrousFilters.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="AtrousFilters.h">
+    <ClInclude Include="Atrousc.h">
       <Filter>Header</Filter>
     </ClInclude>
     <ClInclude Include="AtrousRec.h">

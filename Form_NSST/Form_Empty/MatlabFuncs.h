@@ -1,4 +1,3 @@
-
 #include "Container.h"
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 
@@ -31,5 +30,22 @@ Matrix* Upsample2df(const Matrix* mat, int power);
 
 Matrix* Windowing(double* x, int lenghtX, int L);
 
-double MeyerWind(double x);
+double	MeyerWind(double x);
 
+double* ScalarMatMul(double* mat, int matSize, double scalarValue);
+
+double* RDivide(double* mat, double* rMat, int size);
+
+double* MatrixMultiplication(double* m1, int row1, int col1, double* m2, int row2, int col2);
+
+double* Linspace(int init, int finish, int N);
+
+Matrix* GenXYCoordinates(int n);
+
+Matrix	RecFromPol(Matrix* l, int n, Matrix* gen);
+
+Matrix* ShearingFiltersMyer(int dcomp, int dsize);
+
+Matrix* symext(Matrix* x, Matrix* h, double* shift);
+
+double* AvgPol(int L, double* x1, double* y1, double* x2, double* y2);

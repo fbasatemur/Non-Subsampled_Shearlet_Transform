@@ -1,5 +1,4 @@
-﻿  AtrousDec.cpp
-C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\AtrousDec.cpp(28,10): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
-  AtrousDec.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
-  AtrousDec.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
+﻿  NsstDec.cpp
+  Atrousc.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
+  Atrousc.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
   Form_Empty.vcxproj -> C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Debug\NSST_Form.exe
