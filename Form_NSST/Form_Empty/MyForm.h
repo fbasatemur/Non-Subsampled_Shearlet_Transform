@@ -4,9 +4,11 @@
 #include "Image.h"
 #include "Process.h"
 #include <msclr\marshal_cppstd.h>
+#include <fstream>
 
 #include "ShearParameters.h"
 #include "Container.h"
+#include "NsstDec.h"
 
 namespace Form_Empty {
 
@@ -171,7 +173,7 @@ namespace Form_Empty {
 		{
 			long size;
 			int width, height;
-			BYTE* buffer, * raw_intensity;
+			BYTE* buffer, *raw_intensity;
 			CString str = openFileDialog1->FileName;
 
 
@@ -179,10 +181,26 @@ namespace Form_Empty {
 
 			int displayFlag = 1;
 
-			 
-			buffer = LoadBMP(width, height, size, (LPCTSTR)str);
-			raw_intensity = ConvertBMPToIntensity(buffer, width, height);
+			// LoadBMP can read only 24 bit image depth
+			/*buffer = LoadBMP(width, height, size, (LPCTSTR)str);
+			raw_intensity = ConvertBMPToIntensity(buffer, width, height);*/
 
+			width = 512;
+			height = 512;
+
+			std::ifstream file(str);
+			Matrix* x = new Matrix;
+			x->CreateMatrix(height, width, 1);
+
+			if (file.is_open()) {
+				double temp;
+				for (int i = 0; i < height * width; i++) {
+					file >> temp;
+					x->mat[i] = temp;
+				}
+			}
+			
+			file.close();
 
 			const char* lpfilt = "maxflat";
 			ShearParameters shearParameters;
@@ -213,24 +231,26 @@ namespace Form_Empty {
 			dst->mats[4]->CreateMatrix(width, height, 1);
 
 			Cont* shearF = new Cont(4);
+			shearF->CreateCells();
 			shearF->mats[0]->CreateMatrix(width, height, 1);
 			shearF->mats[1]->CreateMatrix(width, height, 1);
 			shearF->mats[2]->CreateMatrix(width, height, 1);
 			shearF->mats[3]->CreateMatrix(width, height, 1);
 
+			Cont* retDec1e;
 
 			switch (shearVersion)
 			{
 			case 0:
-				//[dst, shear_f] = nsst_dec1e(x, shear_parameters, lpfilt);
+				retDec1e = NsstDec1e(x, shearParameters, lpfilt);
 				break;
 
 			case 1:
-				//[dst, shear_f] = nsst_dec1(x, shear_parameters, lpfilt);
+				1;
 				break;
 
 			case 2:
-				//[dst, shear_f] = nsst_dec2(x, shear_parameters, lpfilt);
+				1;
 				break;
 			default:
 				break;
@@ -332,8 +352,8 @@ namespace Form_Empty {
 			pictureBox1->ImageLocation = openFileDialog1->FileName;
 			labelPath->Text = pictureBox1->ImageLocation;
 
-			delete[] buffer;
-			delete[] raw_intensity;
+			/*delete[] buffer;
+			delete[] raw_intensity;*/
 			/*delete[] Real_part;
 			delete[] Im_part;
 			delete[] fourier255;*/

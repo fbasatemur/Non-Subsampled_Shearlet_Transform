@@ -31,6 +31,9 @@
     <ClCompile Include="Atrousc.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="AtrousRec.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MyForm.h" />
@@ -51,9 +54,6 @@
     </ClInclude>
     <ClInclude Include="ShearParameters.h">
       <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Atrousrec.cpp">
-      <Filter>Source</Filter>
     </ClInclude>
     <ClInclude Include="MatlabFuncs.h">
       <Filter>Header</Filter>

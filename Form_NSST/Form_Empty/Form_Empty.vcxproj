@@ -82,6 +82,7 @@
     <ClCompile Include="Atrousc.cpp" />
     <ClCompile Include="AtrousDec.cpp" />
     <ClCompile Include="AtrousFilters.cpp" />
+    <ClCompile Include="AtrousRec.cpp" />
     <ClCompile Include="FFT.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="MatlabFuncs.cpp" />
@@ -94,7 +95,6 @@
     <ClInclude Include="Atrousc.h" />
     <ClInclude Include="AtrousDec.h" />
     <ClInclude Include="AtrousFilters.h" />
-    <ClInclude Include="Atrousrec.cpp" />
     <ClInclude Include="AtrousRec.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="FFT.h" />

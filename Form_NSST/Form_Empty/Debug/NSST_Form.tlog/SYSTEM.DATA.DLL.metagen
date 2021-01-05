@@ -1536,7 +1536,7 @@ Class System.Data.Common.ADP: AutoLayout, AnsiClass, Class, Abstract, Sealed, Be
     Int32 DecimalMaxPrecision28 = 28 : Assembly, Static, Literal, HasDefault
     Int32 DefaultCommandTimeout = 30 : Assembly, Static, Literal, HasDefault
     Int32 DefaultConnectionTimeout = 15 : Assembly, Static, Literal, HasDefault
-    Single FailoverTimeoutStep = 0,08 : Assembly, Static, Literal, HasDefault
+    Single FailoverTimeoutStep = 0.08 : Assembly, Static, Literal, HasDefault
     Int32 CharSize = 2 : Assembly, Static, Literal, HasDefault
   Properties:
     System.Threading.Tasks.Task`1[System.Boolean] TrueTask 'get ' : 

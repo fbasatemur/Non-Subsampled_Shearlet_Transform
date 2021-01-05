@@ -5,7 +5,7 @@
 #include "MatlabFuncs.h"
 #include "AtrousDec.h"
 
-Cont* NsstDec1e(Matrix* image, struct ShearParameters shearParam, const char* lpfilt)
+Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lpfilt)
 {
 	int level = strlen((char*)shearParam.dcomp);
 	
@@ -21,7 +21,7 @@ Cont* NsstDec1e(Matrix* image, struct ShearParameters shearParam, const char* lp
 	for (int i = 0; i < level; i++)
 	{
 		temp = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]);
-		for (int j = 0; j < temp->GetSize(); j++)
+		for (int j = 0; j < temp->GetSize2D(); j++)
 			temp->mat[j] *= sqrt(shearParam.dsize[i]);
 		shearF->mats[i] = temp;
 

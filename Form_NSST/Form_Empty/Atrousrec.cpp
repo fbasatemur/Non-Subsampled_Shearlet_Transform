@@ -1,13 +1,13 @@
 #pragma once
 #include "AtrousRec.h"
 #include "MatlabFuncs.h"
-#include "symext.h"
+#include "AtrousFilters.h"
+#include <math.h>
 
 Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 
 	int NLevels = y->matNums - 1;
 
-	
 	// [g0, h0, g1, h1] = atrousfilters(fname);
 	Cont* ret = AtrousFilters(lpfilt);
 	Matrix* g0 = ret->mats[0];
@@ -15,7 +15,7 @@ Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 	Matrix* g1 = ret->mats[2];
 	Matrix* h1 = ret->mats[3];
 
-	
+
 	Matrix* x;
 	Matrix* y1;
 
@@ -28,10 +28,10 @@ Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 	for (int i = NLevels - 1; i >= 1; i--) {
 
 		y1 = y->mats[NLevels - i];			// Matlab: y{2} <=> C: y[1]
-		
+
 		shift[0] = -1 * pow(2, (i - 1)) * shift[0] + 2.0;
 		shift[1] = -1 * pow(2, (i - 1)) * shift[1] + 2.0;
-		
+
 		L = pow(2, i);
 
 		// will repairing...		symext
@@ -41,14 +41,12 @@ Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 	shift[0] = 1.0;
 	shift[1] = 1.0;
 
-	// will repairing...			conv2
-	
-	Matrix* symetxX = symetx(x, g0, shift);
-	Matrix* symetxY = symetx(y->mats[NLevels], g0, shift);
+	Matrix* symetxX = symext(x, g0, shift);
+	Matrix* symetxY = symext(y->mats[NLevels], g0, shift);
 
 	Matrix* conv2X = Conv2(symetxX, g0, "valid");
 	Matrix* conv2Y = Conv2(symetxY, g1, "valid");
 	x = *conv2X + *conv2Y;
-	
+
 	return x;
 }

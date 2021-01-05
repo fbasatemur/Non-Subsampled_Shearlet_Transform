@@ -1,4 +1,8 @@
-﻿  NsstDec.cpp
+﻿  MyForm.cpp
+C:\Users\Monster\Desktop\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MyForm.h(176,19): warning C4101: 'raw_intensity': unreferenced local variable
+C:\Users\Monster\Desktop\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MyForm.h(174,9): warning C4101: 'size': unreferenced local variable
+C:\Users\Monster\Desktop\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MyForm.h(331,12): warning C4101: 'xr': unreferenced local variable
+C:\Users\Monster\Desktop\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MyForm.h(176,10): warning C4101: 'buffer': unreferenced local variable
   Atrousc.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
   Atrousc.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
-  Form_Empty.vcxproj -> C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Debug\NSST_Form.exe
+  Form_Empty.vcxproj -> C:\Users\Monster\Desktop\Non-Subsampled_Shearlet_Transform\Form_NSST\Debug\NSST_Form.exe
