@@ -7,7 +7,7 @@
 
 Matrix* Sum(Matrix* mat, int dim) {
 
-	int imageSize = mat->GetSize();
+	int imageSize = mat->GetSize2D();
 
 	Matrix* retMat = new Matrix;
 	retMat->CreateMatrix(mat->height, mat->width, 1);

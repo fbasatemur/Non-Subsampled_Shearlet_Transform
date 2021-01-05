@@ -1,8 +1,8 @@
 #include "NsstRec.h"
 #include "MatlabFuncs.h"
+#include "AtrousRec.h"
 
-
-double* NsstRec1(Cont* dst, const char* lpfilt) {
+Matrix* NsstRec1(Cont* dst, const char* lpfilt) {
 
 	int level = dst->matNums - 1;
 	
@@ -16,6 +16,5 @@ double* NsstRec1(Cont* dst, const char* lpfilt) {
 		y->mats[i] = Sum(dst->mats[i], 3);
 	}
 	
-	/// will repairing...
-	return y->mats[0]->mat; // real(atrousrec(&y,lpfilt));
+	return Atrousrec(y, lpfilt);
 }

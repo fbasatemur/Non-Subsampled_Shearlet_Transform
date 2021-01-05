@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h> 
 #include "MatlabFuncs.h"
+#include <string.h>
 
 // return g0, h0, g1, h1
 Cont* AtrousFilters(const char* fname) {
@@ -17,7 +18,7 @@ Cont* AtrousFilters(const char* fname) {
 	int g1Width = 7;
 	int g1Height = 7;
 
-	if (fname == "maxflat") {
+	if (!strcmp(fname, "maxflat")) {
 
 		double h0[] = { -7.900496718847182e-07, 0.0, 0.000014220894093924927, 0.000025281589500310983, -0.000049773129328737247, -0.00022753430550279883, -0.00033182086219158167,
 		0.0,               0.0,              0.0,                   0.0,                       0.0,                          0.0,                     0.0,

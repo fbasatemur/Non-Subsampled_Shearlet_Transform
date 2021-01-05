@@ -10,6 +10,15 @@ public:
 
 	double* mat;
 
+	Matrix(){}
+	~Matrix(){}
+	
+	Matrix(int height, int width, int depth = 1) {
+		this->height = height;
+		this->width = width;
+		this->depth = depth;
+	}
+
 	void CreateMatrix(int height, int width, int depth = 1) {
 
 		this->height = height;
@@ -18,12 +27,29 @@ public:
 		mat = (double*)calloc(height * width * depth, sizeof(double));
 	}
 
-	int GetSize() { return height * width; }
+	int GetSize2D() { return height * width; }
+	int GetSize3D() { return height * width * depth; }
 
 	double operator()(int row, int col) {
 		return this->mat[row * width + col];
 	}
+
+	double operator()(int index) {
+		return this->mat[index];
+	}
 	
+	Matrix* operator+(Matrix& b) {
+
+		Matrix* temp = new Matrix;
+		temp->CreateMatrix(b.height, b.width, b.depth);
+
+		for (int i = 0; i < temp->GetSize3D(); i++)
+		{
+			temp->mat[i] = this->mat[i] + b.mat[i];
+		}
+
+		return temp;
+	}
 };
 
 // Cont -> Container class

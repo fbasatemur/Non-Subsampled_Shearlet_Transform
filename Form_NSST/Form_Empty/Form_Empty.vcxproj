@@ -95,6 +95,7 @@
     <ClInclude Include="AtrousDec.h" />
     <ClInclude Include="AtrousFilters.h" />
     <ClInclude Include="Atrousrec.cpp" />
+    <ClInclude Include="AtrousRec.h" />
     <ClInclude Include="Container.h" />
     <ClInclude Include="FFT.h" />
     <ClInclude Include="Image.h" />
