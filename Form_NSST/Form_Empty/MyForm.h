@@ -205,6 +205,7 @@ namespace Form_Empty {
 			const char* lpfilt = "maxflat";
 			ShearParameters shearParameters;
 
+			shearParameters.dcompSize = 4;
 			shearParameters.dcomp = new int[4];
 			shearParameters.dcomp[0] = 3;
 			shearParameters.dcomp[1] = 3;

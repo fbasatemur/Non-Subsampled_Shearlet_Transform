@@ -7,7 +7,7 @@
 
 Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lpfilt)
 {
-	int level = strlen((char*)shearParam.dcomp);
+	int level = shearParam.dcompSize;
 	
 	//Laplacian Pyramid decomposition
 	Cont* y = AtrousDec(image, lpfilt, level);

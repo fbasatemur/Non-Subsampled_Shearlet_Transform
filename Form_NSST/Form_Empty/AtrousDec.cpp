@@ -14,7 +14,7 @@ Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
 	Matrix* y0 = Conv2(symext(image, filters->mats[1], shift), filters->mats[1], "valid");
 	Matrix* y1 = Conv2(symext(image, filters->mats[3], shift), filters->mats[3], "valid");
 
-	Cont* y = new Cont(level + 1);
+	Cont* y = new Cont(level + 1);//w,h,d bilgilerii gir.
 	y->mats[level] = y0;
 	image = y0;
 
@@ -30,10 +30,15 @@ Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
 		y0 = Atrousc(symext(image, Upsample2df(filters->mats[1],i), shift), filters->mats[1], I2L);
 		y1 = Atrousc(symext(image, Upsample2df(filters->mats[3],i), shift), filters->mats[3], I2L);
 
-		y->mats[level - i + 1] = y1;
+		y->mats[level - (i+1)] = y1;
 		image = y0;
 	}
 	y->mats[0] = image;
 	
+	for (int i = 0; i < level + 1; i++)
+	{
+		y->mats[i];
+	}
+
 	return y;
 }

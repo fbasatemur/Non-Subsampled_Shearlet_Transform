@@ -335,7 +335,7 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 	{
 		for (int col = colStartIndex; col <= colEndIndex; col++)
 		{
-			cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+			cutMatrix->mat[(row - rowStartIndex) * cutWidth + (col - colStartIndex)] = mat[row * width + col];
 		}
 	}
 
@@ -355,7 +355,7 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
 		for (int row = rowStartIndex; row >= rowEndIndex; row += rowStep)
 			for (int col = colStartIndex; col >= colEndIndex; col += colStep)
-				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+				cutMatrix->mat[(rowStartIndex - row) * cutWidth + (colStartIndex - col)] = mat[row * width + col];
 	}
 	//-,+
 	else if ((rowStep < 0 && rowStartIndex >= rowEndIndex) && (colStep > 0 && colStartIndex <= colEndIndex)) {
@@ -364,7 +364,7 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
 		for (int row = rowStartIndex; row >= rowEndIndex; row += rowStep)
 			for (int col = colStartIndex; col <= colEndIndex; col += colStep)
-				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+				cutMatrix->mat[(rowStartIndex - row) * cutWidth + col] = mat[row * width + col];
 	}
 	//+,-
 	else if ((rowStep > 0 && rowStartIndex <= rowEndIndex) && (colStep < 0 && colStartIndex >= colEndIndex)) {
@@ -373,7 +373,7 @@ Matrix* MatrixCut(const double* mat, int height, int width, int rowStartIndex, i
 		cutMatrix->CreateMatrix(cutHeight, cutWidth, 1);
 		for (int row = rowStartIndex; row <= rowEndIndex; row += rowStep)
 			for (int col = colStartIndex; col >= colEndIndex; col += colStep)
-				cutMatrix->mat[row * cutWidth + col] = mat[row * width + col];
+				cutMatrix->mat[row * cutWidth + (colStartIndex - col)] = mat[row * width + col];
 	}
 	//+,+
 	else if ((rowStep > 0 && rowStartIndex <= rowEndIndex) && (colStep > 0 && colStartIndex <= colEndIndex)){
@@ -503,18 +503,19 @@ double* MatrixMultiplication(double* m1, int row1, int col1, double* m2, int row
 	return m3;
 }
 
-double* Linspace(int init, int finish, int N)
+double* Linspace(int d1, int d2, int N)
 {
-	double* x = (double*)malloc(N * sizeof(double));
-	double step = (finish - init) / (double)N;
+	double a1 = d1, a2 = d2;
 
-	int i = 0;
-	x[i] = init;
-	for (i = 1; i < N; i++)
-		x[i] = x[i - 1] + step;
-	x[N - 1] = finish;
+	int n1 = N - 1;
+	double* y = new double[N]();
 
-	return x;
+	for (int i = 0; i <= n1; i++)
+		y[i] = a1 + i * (a2 - a1) / n1;
+
+	y[0] = a1; y[n1] = a2;
+
+	return y;
 }
 
 
@@ -522,37 +523,46 @@ Matrix* GenXYCoordinates(int n)
 {
 	++n;
 	double* x1 = zeros(n, n);
-	double* y1 = zeros(n, n);
+ 	double* y1 = zeros(n, n);
 	double* x2 = zeros(n, n);
 	double* y2 = zeros(n, n);
 
 	double* xt = zeros(1, n);
-	double* m = zeros(1, n);
+	double* m  = zeros(1, n);
 
-	int y0 = 1, flag;
+	double y0 = 1.0, x0, xN, yN;
+	int flag;
 	for (int i = 0; i < n; i++)
 	{
-		int x0 = i, xN = n - i + 1, yN = n;
+		x0 = i+1; 
+		xN = n - x0 + 1; 
+		yN = n;
+
 		if (xN == x0)   flag = 1;
 		else {
-			m[i] = (yN - y0) / (xN - x0);
+			m[i] = (yN - y0) / (xN - x0);	
 			flag = 0;
 		}
 
 		xt = Linspace(x0, xN, n);
+
+		int index;
 		for (int j = 0; j < n; j++)
 		{
+			index = i * n + j;
 			if (flag == 0)
 			{
-				y1[i * n + j] = round(m[i] * (xt[i * n + j] - x0) + y0);
-				x1[i * n + j] = round(xt[i * n + j]);
-				x2[i * n + j] = y1[i * n + j];
-				y2[i * n + j] = x1[i * n + j];
+				y1[index] = round(m[i] * (xt[j] - x0) + y0);
+				x1[index] = round(xt[j]);
+				x2[index] = y1[index];
+				y2[index] = x1[index];
 			}
 			else
 			{
-				x1[i * n + j] = y2[i * n + j] = (n - 1) / 2 + 1;
-				y1[i * n + j] = x2[i * n + j] = j;
+				x1[index] = (n - 1) / 2 + 1;
+				y2[index] = (n - 1) / 2 + 1;
+				y1[index] = j + 1;
+				x2[index] = j + 1;
 			}
 		}
 
@@ -564,25 +574,32 @@ Matrix* GenXYCoordinates(int n)
 	double* x2n = zeros(n, n);
 	double* y2n = zeros(n, n);
 
+	Matrix* x1Cut = MatrixCut(x1, n + 1, n + 1, 0, n-1, 0, n - 1);
+	Matrix* y1Cut = MatrixCut(y1, n + 1, n + 1, 0, n-1, 0, n - 1);
+	Matrix* x2Cut = MatrixCut(x2, n + 1, n + 1, 1, n, 0, n - 1);
+	Matrix* y2Cut = MatrixCut(y2, n + 1, n + 1, 1, n, 0, n - 1);
+
+	int index;
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
 		{
-			x1n[i * n + j] = x1[i * n + j];
-			y1n[i * n + j] = y1[i * n + j];
-			x2n[i * n + j] = x2[(i + 1) * n + j];
-			y2n[i * n + j] = y2[(i + 1) * n + j];
+			index = i * n + j;
+			x1n[index] = x1Cut->mat[index];
+			y1n[index] = y1Cut->mat[index];
+			x2n[index] = x2Cut->mat[index];
+			y2n[index] = y2Cut->mat[index];
 		}
 
 	//correct for portion outside boundry
 	x1n = Flipud(x1n, n, n);
-	y2n[n * n + 1] = n;
+	y2n[n-1 * n] = n;
 
 	//return [x1n,y1n,x2n,y2n,D]
 	Matrix* ret = new Matrix[5];
-	ret[0].mat = x1n; ret[0].width = n; ret[0].height = n;
-	ret[1].mat = y1n; ret[1].width = n; ret[1].height = n;
-	ret[2].mat = x2n; ret[2].width = n; ret[2].height = n;
-	ret[3].mat = y2n; ret[3].width = n; ret[3].height = n;
+	ret[0].mat = x1n; ret[0].width = n; ret[0].height = n; ret[0].depth = 1; 
+	ret[1].mat = y1n; ret[1].width = n; ret[1].height = n; ret[0].depth = 1; 
+	ret[2].mat = x2n; ret[2].width = n; ret[2].height = n; ret[0].depth = 1; 
+	ret[3].mat = y2n; ret[3].width = n; ret[3].height = n; ret[0].depth = 1; 
 
 	ret[4].mat = AvgPol(n, x1n, y1n, x2n, y2n);
 	ret[4].width = n; ret[4].height = n;
@@ -594,15 +611,15 @@ double* AvgPol(int L, double* x1, double* y1, double* x2, double* y2)
 {
 	double* D = zeros(L, L);
 
-	int offset;
+	//int offset;
 	for (int i = 0; i < L; i++)
 		for (int j = 0; j < L; j++)
-		{
-			offset = y1[i * L + j] * L + x1[i * L + j];
-			D[offset]++;
-			offset = y2[i * L + j] * L + x2[i * L + j];
-			D[offset]++;
-		}
+			D[(int)((y1[i * L + j]-1) * L + (x1[i * L + j]-1))]++;
+			
+	for (int i = 0; i < L; i++)
+		for (int j = 0; j < L; j++)
+			D[(int)((y2[i * L + j]-1) * L + (x2[i * L + j]-1))]++;
+		
 	return D;
 }
 
@@ -613,17 +630,17 @@ Matrix RecFromPol(Matrix* l, int n, Matrix* gen)
 	for (int i = 0; i < n; i++)
 		for (int j = 0; j < n; j++)
 		{
-			offset = gen[1].mat[i * n + j] * n + gen[0].mat[i * n + j];
+			offset = (gen[1].mat[i * n + j]-1) * n + (gen[0].mat[i * n + j]-1);
 			C[offset] += l->mat[i * n + j];
 
-			offset = gen[3].mat[i * n + j] * n + gen[2].mat[i * n + j];
+			offset = (gen[3].mat[i * n + j]-1) * n + (gen[2].mat[i * n + j]-1);
 			C[offset] += l->mat[(i + n) * n + j];
 		}
 
 	C = RDivide(C, gen[4].mat, n * n);
 
 	Matrix matC;
-	matC.mat = C;   matC.width = n;    matC.height = n;
+	matC.mat = C;   matC.width = n;    matC.height = n;		matC.depth = 1;
 
 	return matC;
 }
@@ -650,8 +667,8 @@ Matrix* ShearingFiltersMyer(int n, int level)
 	Matrix* temp;
 	for (int i = 0; i < size; i++)
 	{
-		temp = MatrixCut(wf->mat, wf->height, wf->width, 0, wf->height, 0, i);
-		temp->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, n, 1);
+		temp = MatrixCut(wf->mat, wf->height, wf->width, 0, wf->height-1, i, i);
+		temp->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, 1, n);
 
 		wS[i] = RecFromPol(temp, n, gen);
 		//w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
@@ -678,22 +695,21 @@ Matrix* symext(Matrix* x, Matrix* h, double* shift)
 	double rr = q2 - s2 + 1;
 
 
-	Matrix* yT = new Matrix;
-	Matrix* temp, * extentedMatrix;
+	Matrix* yT, *temp, *extentedMatrix;
 
 	//[fliplr(x(:,1:ss)) x  x(:,n  :-1: n-p-s1+1)]
-	temp = MatrixCut(x->mat, x->height, x->width, 0, x->height, 0, ss); // x(:,1:ss)
-	temp->mat = Fliplr(temp->mat, x->height, x->width);// fliplr(x(:,1:ss))
-	extentedMatrix = MatrixColExtend(temp->mat, temp->height, temp->width, x->mat, x->height, x->width);
-	temp = MatrixCut(x->mat, x->height, x->width, 0, x->height, n, n - p - s1 + 1, 1, -1); // x(:, n : -1 : n - p - s1 + 1)
-	yT = MatrixColExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
+	temp			= MatrixCut(x->mat, x->height, x->width, 0, x->height-1, 0, ss-1); // x(:,1:ss)
+	temp->mat		= Fliplr(temp->mat, temp->height, temp->width);// fliplr(x(:,1:ss))
+	extentedMatrix	= MatrixColExtend(temp->mat, temp->height, temp->width, x->mat, x->height, x->width);
+	temp			= MatrixCut(x->mat, x->height, x->width, 0, x->height-1, n, n - p - s1 + 1 - 1, 1, -1); // x(:, n : -1 : n - p - s1 + 1)
+	yT				= MatrixColExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
 
 	//[flipud(yT(1:rr, : )); yT;  yT(m  :-1 : m - q - s2 + 1, : )]
-	temp = MatrixCut(yT->mat, yT->height, yT->width, 1, rr, 0, yT->height); //yT(1:rr, : )
-	temp->mat = Flipud(temp->mat, temp->height, temp->width);		//flipud(yT(1:rr, : ))
-	extentedMatrix = MatrixRowExtend(temp->mat, temp->height, temp->width, yT->mat, yT->height, yT->width);
-	temp = MatrixCut(yT->mat, yT->height, yT->width, m, m - q - s2 + 1, 0, yT->height, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
-	yT = MatrixRowExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
+	temp			= MatrixCut(yT->mat, yT->height, yT->width, 0, rr-1, 0, yT->height-1); //yT(1:rr, : )
+	temp->mat		= Flipud(temp->mat, temp->height, temp->width);		//flipud(yT(1:rr, : ))
+	extentedMatrix	= MatrixRowExtend(temp->mat, temp->height, temp->width, yT->mat, yT->height, yT->width);
+	temp			= MatrixCut(yT->mat, yT->height, yT->width, m-1, m - q - s2 + 1 -1, 0, yT->height-1, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
+	yT				= MatrixRowExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
 
 	// yT(1:m+p-1 ,1:n+q-1)
 	yT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1, 0, n + q - 1);

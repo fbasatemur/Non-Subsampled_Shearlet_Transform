@@ -24,7 +24,7 @@ public:
 		this->height = height;
 		this->width = width;
 		this->depth = depth;
-		mat = (double*)calloc(height * width * depth, sizeof(double));
+		mat = new double[height * width * depth]();
 	}
 
 	int GetSize2D() { return height * width; }
