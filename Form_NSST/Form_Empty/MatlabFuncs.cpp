@@ -291,9 +291,9 @@ Matrix* MatrixColExtend(double* mat1, int mat1H, int mat1W, double* mat2, int ma
 			extMatrix->mat[row * extWidth + col] = mat1[row * mat1W + col];
 		}
 
-		for (int col = mat1W - 1; col < extWidth; col++)
+		for (int col = mat1W; col < extWidth; col++)
 		{
-			extMatrix->mat[row * extWidth + col] = mat2[row * mat2W + (col - (mat1W - 1))];
+			extMatrix->mat[row * extWidth + col] = mat2[row * mat2W + (col - mat1W)];
 		}
 	}
 

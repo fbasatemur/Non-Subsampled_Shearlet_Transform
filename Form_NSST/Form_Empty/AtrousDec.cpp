@@ -11,6 +11,8 @@ Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
 
 	double* shift = new double[2]{ 1.0, 1.0 };
 
+	// BURAYA KADAR KONTROL YAPILDI
+
 	Matrix* y0 = Conv2(symext(image, filters->mats[1], shift), filters->mats[1], "valid");
 	Matrix* y1 = Conv2(symext(image, filters->mats[3], shift), filters->mats[3], "valid");
 
