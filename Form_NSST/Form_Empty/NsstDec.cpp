@@ -20,9 +20,9 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lp
 	Matrix* temp;
 	for (int i = 0; i < level; i++)
 	{
+		//BURAYA KADAR SORUN YOK.
 		temp = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]);
-		for (int j = 0; j < temp->GetSize2D(); j++)
-			temp->mat[j] *= sqrt(shearParam.dsize[i]);
+		temp->mat = ScalarMatMul(temp->mat, temp->GetSize2D(), sqrt(shearParam.dsize[i]));
 		shearF->mats[i] = temp;
 
 		for (int k = 0; k < pow(2, shearParam.dcomp[i]); k++)

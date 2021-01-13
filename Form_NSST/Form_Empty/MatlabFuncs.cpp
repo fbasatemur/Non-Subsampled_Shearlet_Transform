@@ -314,9 +314,9 @@ Matrix* MatrixRowExtend(double* mat1, int mat1H, int mat1W, double* mat2, int ma
 		{
 			extMatrix->mat[row * mat1W + col] = mat1[row * mat1W + col];
 		}
-		for (int row = mat1H - 1; row < extHeight; row++)
+		for (int row = mat1H; row < extHeight; row++)
 		{
-			extMatrix->mat[row * mat1W + col] = mat2[(row - (mat1H - 1)) * mat1W + col];
+			extMatrix->mat[row * mat1W + col] = mat2[(row - (mat1H)) * mat1W + col];
 		}
 	}
 
@@ -394,7 +394,8 @@ Matrix* Upsample2df(const Matrix* h, int power) {
 	int width = pow(2, power) * h->width;
 
 	Matrix* ho = new Matrix;
-	ho->CreateMatrix(height, width, 1);
+	ho->mat = zeros(width, height);
+	ho->width = width; ho->height = height; ho->depth = 1;
 
 	int step = pow(2, power);
 	int hStep = 0;
@@ -469,9 +470,10 @@ double MeyerWind(double x) {
 
 double* ScalarMatMul(double* mat, int matSize, double scalarValue)
 {
+	double* mat2 = new double[matSize]();
 	for (int i = 0; i < matSize; i++)
-		mat[i] *= scalarValue;
-	return mat;
+		mat2[i] = mat[i] *scalarValue;
+	return mat2;
 }
 
 double* RDivide(double* mat, double* rMat, int size)
@@ -701,18 +703,18 @@ Matrix* symext(Matrix* x, Matrix* h, double* shift)
 	temp			= MatrixCut(x->mat, x->height, x->width, 0, x->height-1, 0, ss-1); // x(:,1:ss)
 	temp->mat		= Fliplr(temp->mat, temp->height, temp->width);// fliplr(x(:,1:ss))
 	extentedMatrix	= MatrixColExtend(temp->mat, temp->height, temp->width, x->mat, x->height, x->width);
-	temp			= MatrixCut(x->mat, x->height, x->width, 0, x->height-1, n, n - p - s1 + 1 - 1, 1, -1); // x(:, n : -1 : n - p - s1 + 1)
+	temp			= MatrixCut(x->mat, x->height, x->width, 0, x->height-1, n-1, n - p - s1 + 1 - 1, 1, -1); // x(:, n : -1 : n - p - s1 + 1)
 	yT				= MatrixColExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
 
 	//[flipud(yT(1:rr, : )); yT;  yT(m  :-1 : m - q - s2 + 1, : )]
-	temp			= MatrixCut(yT->mat, yT->height, yT->width, 0, rr-1, 0, yT->height-1); //yT(1:rr, : )
+	temp			= MatrixCut(yT->mat, yT->height, yT->width, 0, rr-1, 0, yT->width-1); //yT(1:rr, : )
 	temp->mat		= Flipud(temp->mat, temp->height, temp->width);		//flipud(yT(1:rr, : ))
 	extentedMatrix	= MatrixRowExtend(temp->mat, temp->height, temp->width, yT->mat, yT->height, yT->width);
-	temp			= MatrixCut(yT->mat, yT->height, yT->width, m-1, m - q - s2 + 1 -1, 0, yT->height-1, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
+	temp			= MatrixCut(yT->mat, yT->height, yT->width, m-1, m - q - s2 + 1 -1, 0, yT->width-1, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
 	yT				= MatrixRowExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
 
 	// yT(1:m+p-1 ,1:n+q-1)
-	yT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1, 0, n + q - 1);
+	yT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1-1, 0, n + q - 1-1);
 
 	return yT;
 }
