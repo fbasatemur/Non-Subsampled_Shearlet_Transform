@@ -54,6 +54,23 @@ double* Eye(int size) {
 	return identityMat;
 }
 
+Matrix* EyeMatrix(int size) {
+
+	Matrix* identityMat = new Matrix(size, size, 1);
+
+	for (int row = 0; row < size; row++) {
+		for (int col = 0; col < size; col++) {
+
+			if (row == col)
+				identityMat->mat[row * size + col] = 1.0;
+			else
+				identityMat->mat[row * size + col] = 0.0;
+		}
+	}
+
+	return identityMat;
+}
+
 double* ones(int width, int height)
 {
 	double* onesMat = new double[width * height];
@@ -674,6 +691,9 @@ Matrix* ShearingFiltersMyer(int n, int level)
 
 		wS[i] = RecFromPol(temp, n, gen);
 		//w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
+		
+		Matrix* fftS1 = FFTShift(&wS[i]);		// fftshift(w_s(:, : , k))
+
 	}
 
 	return wS;
@@ -717,4 +737,36 @@ Matrix* symext(Matrix* x, Matrix* h, double* shift)
 	yT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1-1, 0, n + q - 1-1);
 
 	return yT;
+}
+
+void circshift(double* output, double* input, int rows, int cols, int yshift, int xshift)
+{
+	for (int r = 0; r < rows; r++) {
+
+		int newR = (r + yshift) % rows;
+		
+		if (newR < 0) 
+			newR = rows + newR;
+		
+		for (int c = 0; c < cols; c++) {
+
+			int newC = (c + xshift) % cols;
+
+			if (newC < 0) 
+				newC = cols + newC;
+
+			output[newR * cols + newC] = input[r * cols + c];
+		}
+	}
+}
+
+Matrix* FFTShift(Matrix* input) {
+
+	Matrix* temp = new Matrix;
+	temp->CreateMatrix(input->height, input->width, input->depth);
+
+	// x = circshift(x,floor(size(x)/2));
+	circshift(temp->mat, input->mat, temp->height, temp->width, floor(temp->height / 2), floor(temp->width / 2));
+
+	return temp;
 }

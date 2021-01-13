@@ -50,6 +50,19 @@ public:
 
 		return temp;
 	}
+
+	Matrix* operator*(double L) {
+		
+		Matrix* temp = new Matrix;
+		temp->CreateMatrix(this->height, this->width, this->depth);
+
+		for (int i = 0; i < temp->GetSize3D(); i++)
+		{
+			temp->mat[i] = this->mat[i] * L;
+		}
+		
+		return temp;
+	}
 };
 
 // Cont -> Container class
@@ -69,6 +82,10 @@ public:
 		{
 			mats[i] = new Matrix;
 		}
+	}
+
+	int GetCells() {
+		return matNums;
 	}
 
 	~Cont(){
