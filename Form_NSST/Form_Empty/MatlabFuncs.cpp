@@ -5,6 +5,12 @@
 # define PI           3.14159265358979323846
 #define ERROR (double*)-1
 
+inline double realmod(double x, double y)
+{
+	double result = fmod(x, y);
+	return result >= 0 ? result : result + y;
+}
+
 Matrix* Sum(Matrix* mat, int dim) {
 
 	int imageSize = mat->GetSize2D();
@@ -57,7 +63,8 @@ double* Eye(int size) {
 double* ones(int width, int height)
 {
 	double* onesMat = new double[width * height];
-	memset(onesMat, 1.0, height * width * sizeof(double));
+	for (int i = 0; i < width * height; i++)
+		onesMat[i] = 1.0;
 
 	return onesMat;
 }
@@ -65,7 +72,8 @@ double* ones(int width, int height)
 double* zeros(int width, int height)
 {
 	double* zerosMat = new double[width * height];
-	memset(zerosMat, 0.0, height * width * sizeof(double));
+	for (int i = 0; i < width * height; i++)
+		zerosMat[i] = 0.0;
 
 	return zerosMat;
 }
@@ -73,7 +81,8 @@ double* zeros(int width, int height)
 double* zeros(int width, int height, int depth)
 {
 	double* zerosMat = new double[width * height * depth];
-	memset(zerosMat, 0.0, height * width * depth * sizeof(double));
+	for (int i = 0; i < height * width * depth; i++)
+		zerosMat[i] = 0.0;
 
 	return zerosMat;
 }
@@ -422,10 +431,10 @@ Matrix* Windowing(double* x, int lenghtX, int L) {
 	y->depth = 1;
 	y->mat = zeros(L, N);
 
-	int T = N / L;
+	double T = N / L;
 	double* g = zeros(2 * T, 1);
 
-	int n = 0;
+	double n = 0;
 	for (int j = 0; j < 2 * T; j++)
 	{
 		n = -1 * T / 2 + j;
@@ -438,8 +447,7 @@ Matrix* Windowing(double* x, int lenghtX, int L) {
 		index = 0;
 		for (int k = -1 * T / 2; k <= 1.5 * T - 1; k++)
 		{
-			double a = (int)(k + j * T) % N;
-			int in_sig = floor(a);
+			int in_sig = floor(realmod((int)(k + j * T), N));
 			y->mat[in_sig * y->width + j] = g[index] * x[in_sig];
 			index++;
 		}
@@ -452,14 +460,14 @@ double MeyerWind(double x) {
 
 	double y = 0.0;
 	
-	if ((- 1 / 3 + 1 / 2 < x) && (x < 1 / 3 + 1 / 2))
+	if ((- 1.0 / 3.0 + 1.0 / 2.0 < x) && (x < 1.0 / 3.0 + 1.0 / 2.0))
 		y = 1.0;
 
-	else if (((1 / 3 + 1 / 2 <= x) && (x <= 2 / 3 + 1 / 2)) || ((-2 / 3 + 1 / 2 <= x) && (x <= 1 / 3 + 1 / 2))) {
+	else if (((1.0 / 3.0 + 1.0 / 2.0 <= x) && (x <= 2.0 / 3.0 + 1.0 / 2.0)) || ((-2.0 / 3.0 + 1.0 / 2.0 <= x) && (x <= 1.0 / 3.0 + 1.0 / 2.0))) {
 
-		double w = 3 * abs(x - 1 / 2) - 1;
+		double w = 3.0 * abs(x - 1.0 / 2.0) - 1.0;
 		double z = pow(w, 4) * (35 - 84 * w + 70 * pow(w, 2) - 20 * pow(w, 3));
-		y = pow(cos(PI / 2 * (z)), 2);
+		y = pow(cos(PI / 2.0 * (z)), 2);
 	}
 
 	else
@@ -594,7 +602,7 @@ Matrix* GenXYCoordinates(int n)
 
 	//correct for portion outside boundry
 	x1n = Flipud(x1n, n, n);
-	y2n[n-1 * n] = n;
+	y2n[(n-1)*n] = n;
 
 	//return [x1n,y1n,x2n,y2n,D]
 	Matrix* ret = new Matrix[5];
@@ -673,6 +681,7 @@ Matrix* ShearingFiltersMyer(int n, int level)
 		temp->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, 1, n);
 
 		wS[i] = RecFromPol(temp, n, gen);
+		//BURAYA KADAR SORUN YOK.
 		//w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
 	}
 

@@ -15,7 +15,7 @@ Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
 	Matrix* y1 = Conv2(symext(image, filters->mats[3], shift), filters->mats[3], "valid");
 
 	Cont* y = new Cont(level + 1);
-	y->mats[level] = y0;
+	y->mats[level] = y1;
 	image = y0;
 
 	double* I2 = Eye(2), *I2L;

@@ -1,5 +1,20 @@
-﻿  AtrousDec.cpp
-C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\AtrousDec.cpp(27,10): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+﻿  MatlabFuncs.cpp
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(402,13): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(403,12): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(409,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(435,22): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(448,14): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(452,15): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(560,21): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(560,17): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(646,43): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(649,43): warning C4244: '=': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(667,51): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(669,11): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(714,71): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(717,86): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(721,58): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Form_Empty\MatlabFuncs.cpp(724,73): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
   Atrousc.obj : /DEBUG:FASTLINK is not supported when managed code is present; restarting link with /DEBUG:FULL
   Atrousc.obj : MSIL module encountered; incremental linking is disabled for MSIL; performing full link
   Form_Empty.vcxproj -> C:\Users\batuhan\Desktop\NSST_repo\Non-Subsampled_Shearlet_Transform\Form_NSST\Debug\NSST_Form.exe
