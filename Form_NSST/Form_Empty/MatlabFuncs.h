@@ -5,6 +5,7 @@
 Matrix* Sum(Matrix* mat, int dim);
 
 double* Eye(int size);
+Matrix* EyeMatrix(int size);
 
 double* ones(int width, int height);
 double* zeros(int width, int height);
@@ -49,3 +50,5 @@ Matrix* ShearingFiltersMyer(int dcomp, int dsize);
 Matrix* symext(Matrix* x, Matrix* h, double* shift);
 
 double* AvgPol(int L, double* x1, double* y1, double* x2, double* y2);
+
+Matrix* FFTShift(Matrix* input);

@@ -3,8 +3,9 @@
 #include "MatlabFuncs.h"
 #include "AtrousFilters.h"
 #include <math.h>
+#include "Atrousc.h"
 
-Matrix* Atrousrec(Cont* y, const char* lpfilt) {
+Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 
 	int NLevels = y->matNums - 1;
 
@@ -21,7 +22,7 @@ Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 
 	x = y->mats[0];
 
-	double* I2 = Eye(2);
+	Matrix* I2 = EyeMatrix(2);
 	double* shift = new double[2]{ 1.0, 1.0 };
 	double L = 0.0;
 
@@ -34,8 +35,21 @@ Matrix* Atrousrec(Cont* y, const char* lpfilt) {
 
 		L = pow(2, i);
 
-		// will repairing...		symext
+		
 		// x = atrousc(symext(x, upsample2df(g0, i), shift), g0, L * I2) + atrousc(symext(y1, upsample2df(g1, i), shift), g1, L * I2);
+
+		Matrix* mult = *I2 * L;
+
+		Matrix* up1 = Upsample2df(g0, i);
+		Matrix* symext1 = symext(x, up1, shift);
+		Matrix* atrousc1 = Atrousc(symext1, g0, mult->mat);
+
+		Matrix* up2 = Upsample2df(g1, i);
+		Matrix* symext2 = symext(y1, up2, shift);
+		Matrix* atrousc2 = Atrousc(symext2, g1, mult->mat);
+
+		x = *atrousc1 + *atrousc2;
+
 	}
 
 	shift[0] = 1.0;

@@ -16,5 +16,5 @@ Matrix* NsstRec1(Cont* dst, const char* lpfilt) {
 		y->mats[i] = Sum(dst->mats[i], 3);
 	}
 	
-	return Atrousrec(y, lpfilt);
+	return AtrousRec(y, lpfilt);
 }

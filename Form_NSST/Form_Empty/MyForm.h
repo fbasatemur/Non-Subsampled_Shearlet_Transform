@@ -9,6 +9,7 @@
 #include "ShearParameters.h"
 #include "Container.h"
 #include "NsstDec.h"
+#include "NsstRec.h"
 
 namespace Form_Empty {
 
@@ -226,10 +227,10 @@ namespace Form_Empty {
 			Cont* dst = new Cont(5);
 			dst->CreateCells();
 			dst->mats[0]->CreateMatrix(width, height, 1);
-			dst->mats[1]->CreateMatrix(width, height, 1);
-			dst->mats[2]->CreateMatrix(width, height, 1);
-			dst->mats[3]->CreateMatrix(width, height, 1);
-			dst->mats[4]->CreateMatrix(width, height, 1);
+			dst->mats[1]->CreateMatrix(width, height, 8);
+			dst->mats[2]->CreateMatrix(width, height, 8);
+			dst->mats[3]->CreateMatrix(width, height, 16);
+			dst->mats[4]->CreateMatrix(width, height, 16);
 
 			Cont* shearF = new Cont(4);
 			shearF->CreateCells();
@@ -243,6 +244,7 @@ namespace Form_Empty {
 			switch (shearVersion)
 			{
 			case 0:
+				// [dst,shear_f]=nsst_dec1e(x,shear_parameters,lpfilt);
 				retDec1e = NsstDec1e(x, shearParameters, lpfilt);
 				break;
 
@@ -329,11 +331,12 @@ namespace Form_Empty {
 			*/
 
 
-			double* xr;
+
+			Matrix* xr;
 			switch (shearVersion)
 			{
 			case 0:
-				//   xr = nsst_rec1(dst, lpfilt);
+				xr = NsstRec1(dst, lpfilt);
 				break;
 
 			case 1:
