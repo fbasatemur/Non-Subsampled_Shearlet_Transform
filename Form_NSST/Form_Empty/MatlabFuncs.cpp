@@ -1,6 +1,7 @@
 #include <string.h>		//for strcmp
 #include "MatlabFuncs.h"
 #include <cmath>
+#include "Process.h"
 
 # define PI           3.14159265358979323846
 #define ERROR (double*)-1
@@ -86,22 +87,22 @@ double* ones(int width, int height)
 	return onesMat;
 }
 
-double* zeros(int width, int height)
-{
-	double* zerosMat = new double[width * height];
-	for (int i = 0; i < width * height; i++)
-		zerosMat[i] = 0.0;
-
-	return zerosMat;
-}
+//double* zeros(int width, int height)
+//{
+//	double* zerosMat = new double[width * height];
+//	for (int i = 0; i < width * height; i++)
+//		zerosMat[i] = 0.0;
+//
+//	return zerosMat;
+//}
 
 double* zeros(int width, int height, int depth)
 {
-	double* zerosMat = new double[width * height * depth];
-	for (int i = 0; i < height * width * depth; i++)
-		zerosMat[i] = 0.0;
+	//double* zerosMat = new double[width * height * depth];
+	//for (int i = 0; i < height * width * depth; i++)
+	//	zerosMat[i] = 0.0;
 
-	return zerosMat;
+	return (double*)calloc(width * height * depth, sizeof(double));
 }
 
 double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type = "same")
@@ -681,6 +682,8 @@ Matrix* ShearingFiltersMyer(int n, int level)
 	Matrix* wf = Windowing(ones(2 * n, 1), 2 * n, pow(2, level));
 
 	int size = pow(2, level);
+
+
 	Matrix* wS = new Matrix[size];
 	for (int i = 0; i < size; i++)
 	{
@@ -692,16 +695,27 @@ Matrix* ShearingFiltersMyer(int n, int level)
 
 	double* one = ones(n, 1);
 	Matrix* temp;
+	double* fftS1;
+	double* inImag  = zeros(n, n);
+	double* outReal = zeros(n, n);
+	double* outImag = zeros(n, n);
+	
 	for (int i = 0; i < size; i++)
 	{
 		temp = MatrixCut(wf->mat, wf->height, wf->width, 0, wf->height-1, i, i);
 		temp->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, 1, n);
 
 		wS[i] = RecFromPol(temp, n, gen);
-		//BURAYA KADAR SORUN YOK.
-		//w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
+
+		// w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
 		
-		Matrix* fftS1 = FFTShift(&wS[i]);		// fftshift(w_s(:, : , k))
+		fftS1 = FFTShift2D(wS[i].mat, wS[i].width, wS[i].height);				// fftshift(w_s(:, : , k))
+
+		IFFT2D(outReal, outImag, fftS1, inImag, wS[i].width, wS[i].height);		// ifft2(fftshift(w_s(:, : , k)))
+
+		wS[i].mat = FFTShift2D(outReal, wS[i].width, wS[i].height);				// real(fftshift(ifft2(fftshift(w_s(:, : , k)))))
+		
+		wS[i] /= (double)sqrt(n);												// real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
 
 	}
 
@@ -769,13 +783,12 @@ void circshift(double* output, double* input, int rows, int cols, int yshift, in
 	}
 }
 
-Matrix* FFTShift(Matrix* input) {
+double* FFTShift2D(double* input, int width, int height){
 
-	Matrix* temp = new Matrix;
-	temp->CreateMatrix(input->height, input->width, input->depth);
+	double* temp = new double[width * height];
 
 	// x = circshift(x,floor(size(x)/2));
-	circshift(temp->mat, input->mat, temp->height, temp->width, floor(temp->height / 2), floor(temp->width / 2));
+	circshift(temp, input, height, width, floor(height / 2), floor(width / 2));
 
 	return temp;
 }

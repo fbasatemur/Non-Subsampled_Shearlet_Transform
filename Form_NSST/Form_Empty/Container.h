@@ -24,7 +24,7 @@ public:
 		this->height = height;
 		this->width = width;
 		this->depth = depth;
-		mat = new double[height * width * depth];
+		mat = (double*)calloc(height * width * depth, sizeof(double));
 	}
 
 	int GetSize2D() { return height * width; }
@@ -63,6 +63,15 @@ public:
 		
 		return temp;
 	}
+
+	void operator/=(double L) {
+
+		for (int i = 0; i < this->GetSize3D(); i++)
+		{
+			this->mat[i] = this->mat[i] / L;
+		}
+	}
+
 };
 
 // Cont -> Container class

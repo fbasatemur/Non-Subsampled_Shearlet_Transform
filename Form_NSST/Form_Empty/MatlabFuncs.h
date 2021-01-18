@@ -8,8 +8,8 @@ double* Eye(int size);
 Matrix* EyeMatrix(int size);
 
 double* ones(int width, int height);
-double* zeros(int width, int height);
-double* zeros(int width, int height, int depth);
+//double* zeros(int width, int height);
+double* zeros(int width, int height, int depth = 1);
 
 Matrix* Conv2(Matrix* image, Matrix* kernel, char* type);
 Matrix* Conv2(Matrix* image, Matrix kernel, char* type);
@@ -51,4 +51,4 @@ Matrix* symext(Matrix* x, Matrix* h, double* shift);
 
 double* AvgPol(int L, double* x1, double* y1, double* x2, double* y2);
 
-Matrix* FFTShift(Matrix* input);
+double* FFTShift2D(double* input, int width, int height);
