@@ -16,19 +16,21 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lp
 	dst->mats[0] = y->mats[0];
 
 	Cont* shearF = new Cont(level);
+	shearF->CreateCells();
 
 	Matrix* temp;
 	for (int i = 0; i < level; i++)
 	{
-		
-		temp = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]);
-		//BURAYA KADAR SORUN YOK.
-		temp->mat = ScalarMatMul(temp->mat, temp->GetSize2D(), sqrt(shearParam.dsize[i]));
-		shearF->mats[i] = temp;
+		int size = pow(2, shearParam.dcomp[i]);
+		dst->CreateCells(i+1, size);
+		shearF->CreateCells(i,size);
 
-		for (int k = 0; k < pow(2, shearParam.dcomp[i]); k++)
-			dst->mats[i + 1] = Conv2(y->mats[i+1], shearF->mats[i][k], "same");
+		temp = ShearingFiltersMyer(shearParam.dsize[i], shearParam.dcomp[i]);
+
+		for (int k = 0; k < size; k++) {
+			shearF->mats[i][k] = ScalarMatMul(temp[k], sqrt(shearParam.dsize[i]));
+			dst->mats[i + 1][k] = Conv2(y->mats[i + 1], shearF->mats[i][k], "same");
+		}	
 	}
-	
 	return dst;
 }

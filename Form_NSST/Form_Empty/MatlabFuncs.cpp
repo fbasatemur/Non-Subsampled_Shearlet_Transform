@@ -218,7 +218,7 @@ Matrix* Conv2(Matrix* image, Matrix* kernel, char* type = "same")
 	return outMat;
 }
 
-Matrix* Conv2(Matrix* image, Matrix kernel, char* type = "same")
+Matrix Conv2(Matrix* image, Matrix kernel, char* type = "same")
 {
 	int outRow, outCol, edgeRows, edgeCols;
 
@@ -244,11 +244,11 @@ Matrix* Conv2(Matrix* image, Matrix kernel, char* type = "same")
 	}
 	else
 	{
-		return (Matrix*)-1;
+		exit(1);
 	}
 
-	Matrix* outMat = new Matrix;
-	outMat->CreateMatrix(outRow, outCol);
+	Matrix outMat;
+	outMat.CreateMatrix(outRow, outCol);
 	int iImage, iKernel, jImage, jKernel;
 	double sum = 0;
 	for (int i = 0; i < outRow; i++)
@@ -267,7 +267,7 @@ Matrix* Conv2(Matrix* image, Matrix kernel, char* type = "same")
 				for (; (jKernel >= 0) && (jImage < image->width); jKernel--, jImage++)
 					sum += image->mat[image->width * iImage + jImage] * kernel.mat[kernel.width * iKernel + jKernel];
 			}
-			outMat->mat[i * outCol + j] = sum;
+			outMat.mat[i * outCol + j] = sum;
 		}
 	}
 	return outMat;
@@ -500,6 +500,17 @@ double* ScalarMatMul(double* mat, int matSize, double scalarValue)
 	for (int i = 0; i < matSize; i++)
 		mat2[i] = mat[i] *scalarValue;
 	return mat2;
+}
+
+Matrix ScalarMatMul(Matrix matx, double scalarValue)
+{
+	Matrix ret; 
+	ret.CreateMatrix(matx.height, matx.width, matx.depth);	
+
+	for (int i = 0; i < matx.GetSize3D(); i++)
+		ret.mat[i] = matx.mat[i] * scalarValue;
+
+	return ret;
 }
 
 double* RDivide(double* mat, double* rMat, int size)

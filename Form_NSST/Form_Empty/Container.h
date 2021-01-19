@@ -93,6 +93,10 @@ public:
 		}
 	}
 
+	void CreateCells(int index, int size) {
+		mats[index] = new Matrix[size];		
+	}
+
 	int GetCells() {
 		return matNums;
 	}

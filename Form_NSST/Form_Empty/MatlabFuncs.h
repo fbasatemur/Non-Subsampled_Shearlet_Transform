@@ -12,7 +12,7 @@ double* ones(int width, int height);
 double* zeros(int width, int height, int depth = 1);
 
 Matrix* Conv2(Matrix* image, Matrix* kernel, char* type);
-Matrix* Conv2(Matrix* image, Matrix kernel, char* type);
+Matrix	Conv2(Matrix* image, Matrix kernel, char* type);
 double* Conv2(double* image, int imageRow, int imageCol, double* kernel, int kernelRow, int kernelCol, char* type);
 
 double* Fliplr(const double* arry, int height, int width);
@@ -34,6 +34,7 @@ Matrix* Windowing(double* x, int lenghtX, int L);
 double	MeyerWind(double x);
 
 double* ScalarMatMul(double* mat, int matSize, double scalarValue);
+Matrix	ScalarMatMul(Matrix matx, double scalarValue);
 
 double* RDivide(double* mat, double* rMat, int size);
 
