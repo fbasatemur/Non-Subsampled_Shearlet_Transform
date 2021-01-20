@@ -7,11 +7,10 @@ public:
 	int height;
 	int width;
 	int depth;
-
 	double* mat;
 
 	Matrix(){}
-	~Matrix(){}
+	~Matrix() {}
 	
 	Matrix(int height, int width, int depth = 1) {
 		this->height = height;
@@ -24,20 +23,13 @@ public:
 		this->height = height;
 		this->width = width;
 		this->depth = depth;
-		mat = (double*)calloc(height * width * depth, sizeof(double));
+		mat = new double[height * width * depth];
 	}
 
 	int GetSize2D() { return height * width; }
 	int GetSize3D() { return height * width * depth; }
 
-	double operator()(int row, int col) {
-		return this->mat[row * width + col];
-	}
 
-	double operator()(int index) {
-		return this->mat[index];
-	}
-	
 	Matrix* operator+(Matrix& b) {
 
 		Matrix* temp = new Matrix;
@@ -94,11 +86,7 @@ public:
 	}
 
 	void CreateCells(int index, int size) {
-		mats[index] = new Matrix[size];		
-	}
-
-	int GetCells() {
-		return matNums;
+		mats[index] = new Matrix[size];	
 	}
 
 	~Cont(){

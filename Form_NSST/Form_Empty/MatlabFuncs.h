@@ -8,7 +8,7 @@ double* Eye(int size);
 Matrix* EyeMatrix(int size);
 
 double* ones(int width, int height);
-//double* zeros(int width, int height);
+
 double* zeros(int width, int height, int depth = 1);
 
 Matrix* Conv2(Matrix* image, Matrix* kernel, char* type);

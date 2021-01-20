@@ -54,6 +54,8 @@ namespace Form_Empty {
 	private: System::Windows::Forms::PictureBox^ pictureBox2;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Label^ labelPath;
+	private: System::Windows::Forms::Label^ label2;
+	private: System::Windows::Forms::Label^ label3;
 
 	private:
 		/// <summary>
@@ -76,6 +78,8 @@ namespace Form_Empty {
 			this->pictureBox2 = (gcnew System::Windows::Forms::PictureBox());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->labelPath = (gcnew System::Windows::Forms::Label());
+			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->label3 = (gcnew System::Windows::Forms::Label());
 			this->menuStrip1->SuspendLayout();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox2))->BeginInit();
@@ -91,7 +95,7 @@ namespace Form_Empty {
 			this->menuStrip1->Items->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->openToolStripMenuItem });
 			this->menuStrip1->Location = System::Drawing::Point(0, 0);
 			this->menuStrip1->Name = L"menuStrip1";
-			this->menuStrip1->Size = System::Drawing::Size(1073, 28);
+			this->menuStrip1->Size = System::Drawing::Size(1050, 28);
 			this->menuStrip1->TabIndex = 0;
 			this->menuStrip1->Text = L"menuStrip1";
 			// 
@@ -111,7 +115,7 @@ namespace Form_Empty {
 			// 
 			// pictureBox1
 			// 
-			this->pictureBox1->Location = System::Drawing::Point(12, 71);
+			this->pictureBox1->Location = System::Drawing::Point(12, 82);
 			this->pictureBox1->Name = L"pictureBox1";
 			this->pictureBox1->Size = System::Drawing::Size(500, 500);
 			this->pictureBox1->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
@@ -120,7 +124,7 @@ namespace Form_Empty {
 			// 
 			// pictureBox2
 			// 
-			this->pictureBox2->Location = System::Drawing::Point(518, 71);
+			this->pictureBox2->Location = System::Drawing::Point(528, 82);
 			this->pictureBox2->Name = L"pictureBox2";
 			this->pictureBox2->Size = System::Drawing::Size(500, 500);
 			this->pictureBox2->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
@@ -145,11 +149,31 @@ namespace Form_Empty {
 			this->labelPath->TabIndex = 4;
 			this->labelPath->Text = L"...";
 			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Location = System::Drawing::Point(12, 59);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(99, 17);
+			this->label2->TabIndex = 5;
+			this->label2->Text = L"Original Image";
+			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Location = System::Drawing::Point(525, 59);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(27, 17);
+			this->label3->TabIndex = 6;
+			this->label3->Text = L"XR";
+			// 
 			// MyForm
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
-			this->ClientSize = System::Drawing::Size(1073, 583);
+			this->ClientSize = System::Drawing::Size(1050, 600);
+			this->Controls->Add(this->label3);
+			this->Controls->Add(this->label2);
 			this->Controls->Add(this->labelPath);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->pictureBox2);
@@ -172,13 +196,10 @@ namespace Form_Empty {
 
 		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
-			long size;
+			//long size;
+			//BYTE* buffer, *raw_intensity;
 			int width, height;
-			BYTE* buffer, *raw_intensity;
 			CString str = openFileDialog1->FileName;
-
-
-			////////////// this line started develop    
 
 			int displayFlag = 1;
 
@@ -190,17 +211,17 @@ namespace Form_Empty {
 			height = 512;
 
 			std::ifstream file(str);
-			Matrix* x = new Matrix;
-			x->CreateMatrix(height, width, 1);
+			Matrix* image = new Matrix;
+			image->CreateMatrix(height, width, 1);
 
 			if (file.is_open()) {
 				double temp;
 				for (int i = 0; i < height * width; i++) {
 					file >> temp;
-					x->mat[i] = temp;
+					image->mat[i] = temp;
 				}
 			}
-			
+
 			file.close();
 
 			const char* lpfilt = "maxflat";
@@ -214,7 +235,7 @@ namespace Form_Empty {
 			shearParameters.dcomp[3] = 4;
 
 			shearParameters.dsize = new int[4];
-			shearParameters.dsize[0] = 32; 
+			shearParameters.dsize[0] = 32;
 			shearParameters.dsize[1] = 32;
 			shearParameters.dsize[2] = 16;
 			shearParameters.dsize[3] = 16;
@@ -224,112 +245,24 @@ namespace Form_Empty {
 			//int shear_version = 2;		// nsst_dec2
 
 
-			Cont* dst = new Cont(5);
-			dst->CreateCells();
-			dst->mats[0]->CreateMatrix(width, height, 1);
-			dst->mats[1]->CreateMatrix(width, height, 8);
-			dst->mats[2]->CreateMatrix(width, height, 8);
-			dst->mats[3]->CreateMatrix(width, height, 16);
-			dst->mats[4]->CreateMatrix(width, height, 16);
-
-			Cont* shearF = new Cont(4);
-			shearF->CreateCells();
-			shearF->mats[0]->CreateMatrix(width, height, 1);
-			shearF->mats[1]->CreateMatrix(width, height, 1);
-			shearF->mats[2]->CreateMatrix(width, height, 1);
-			shearF->mats[3]->CreateMatrix(width, height, 1);
-
-			Cont* retDec1e;
-
+			Cont* dst;
 			switch (shearVersion)
 			{
 			case 0:
-				// [dst,shear_f]=nsst_dec1e(x,shear_parameters,lpfilt);
-				retDec1e = NsstDec1e(x, shearParameters, lpfilt);
+				// [dst,shear_f]=nsst_dec1e(image,shear_parameters,lpfilt);
+				dst = NsstDec1e(image, shearParameters, lpfilt);			// dst->mats[cellIndex][deepIndex]
 				break;
 
 			case 1:
-				1;
+				// [dst, shear_f] = nsst_dec1(image, shear_parameters, lpfilt);
 				break;
 
 			case 2:
-				1;
+				// [dst,shear_f]=nsst_dec2(image,shear_parameters,lpfilt);
 				break;
 			default:
 				break;
 			}
-			
-			Bitmap^ surface = gcnew Bitmap(width, height);
-			pictureBox2->Image = surface;
-			
-			/////////////////////  display coefficients - will complete
-			//
-			// DISPLAY
-			// 
-			/*if (displayFlag == 1) {
-
-			}*/
-			////////////////
-
-
-
-			/*
-			* FFT IMAGE PROCESS
-			*
-			*
-			// Daha sonra width * height 'luk resmin FFT'si aliniyor
-			double* Real_part = new double[width * height];
-			double* Im_part = new double[width * height];
-			double* image = new double[width * height];
-
-			// width * height 'lik FFT bolgesi secilir
-			const int FFTWidth = width;
-			const int FFTHeight = height;
-			double* cutFFT = new double[FFTWidth * FFTHeight];
-			double* fourier255 = new double[FFTWidth * FFTHeight];		// 0-255 fft values
-			//double* fourier1 = new double[FFTWidth * FFTHeight];			// 0-1 fft values
-
-			//Gri seviyeyedeki image frekans domeninde ortalanmasi için (-1)^(x+y) ile carpiliyor
-			for (int i = 0; i < height; i++)
-				for (int j = 0; j < width; j++)
-					image[i * width + j] = double(raw_intensity[i * width + j]) * pow(-1, (i + j));
-
-
-			FFT2D(image, Real_part, Im_part, width, height);
-
-			double deger;
-			double maks1 = -1000000000;
-			double min1 = 1000000000;
-
-			for (int i = 0; i < height; i++)
-				for (int j = 0; j < width; j++) {
-
-					deger = log(0.05 + sqrt(Real_part[i * width + j] * Real_part[i * width + j] + Im_part[i * width + j] * Im_part[i * width + j]));
-					cutFFT[i * FFTWidth + j] = deger;
-
-					if (deger > maks1)
-						maks1 = deger;
-					if (deger < min1)
-						min1 = deger;
-				}
-
-
-			for (int i = 0; i < FFTHeight; i++)
-				for (int j = 0; j < FFTWidth; j++) {
-					fourier255[i * FFTWidth + j] = (cutFFT[i * FFTWidth + j] - min1) / (maks1 - min1) * 255;
-					//fourier1[i * FFTWidth + j] = (cutFFT[i * FFTWidth + j] - min1) / (maks1 - min1);
-				}
-
-			Color c;
-			for (int row = 0; row < FFTHeight; row++)
-				for (int col = 0; col < FFTWidth; col++) {
-
-					c = Color::FromArgb(BYTE(fourier255[row * FFTWidth + col]), BYTE(fourier255[row * FFTWidth + col]), BYTE(fourier255[row * FFTWidth + col]));
-					surface->SetPixel(col, row, c);
-				}
-
-			*/
-
 
 
 			Matrix* xr;
@@ -352,17 +285,32 @@ namespace Form_Empty {
 
 
 
+			// display result
+
+			Bitmap^ surface1 = gcnew Bitmap(width, height);
+			Bitmap^ surface2 = gcnew Bitmap(width, height);
+			pictureBox1->Image = surface1;		// Original image
+			pictureBox2->Image = surface2;		// NSST image
+			Color c1, c2;
+
+			for (int row = 0; row < height; row++)
+				for (int col = 0; col < width; col++) {
+
+					c1 = Color::FromArgb((int)image->mat[row * width + col], (int)image->mat[row * width + col], (int)image->mat[row * width + col]);
+					surface1->SetPixel(col, row, c1);
+
+					c2 = Color::FromArgb((int)ceil(xr->mat[row * width + col]), (int)ceil(xr->mat[row * width + col]), (int)ceil(xr->mat[row * width + col]));
+					surface2->SetPixel(col, row, c2);
+				}
+
+
+			pictureBox1->Refresh();
 			pictureBox2->Refresh();
-			pictureBox1->ImageLocation = openFileDialog1->FileName;
-			labelPath->Text = pictureBox1->ImageLocation;
+			//pictureBox1->ImageLocation = openFileDialog1->FileName;
+			//labelPath->Text = pictureBox1->ImageLocation;
 
 			/*delete[] buffer;
 			delete[] raw_intensity;*/
-			/*delete[] Real_part;
-			delete[] Im_part;
-			delete[] fourier255;*/
-			//delete[] fourier1;
-			//delete[] image;
 		}
 	}
 	};

@@ -30,8 +30,8 @@ Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 
 		y1 = y->mats[NLevels - i];			// Matlab: y{2} <=> C: y[1]
 
-		shift[0] = -1 * pow(2, (i - 1)) * shift[0] + 2.0;
-		shift[1] = -1 * pow(2, (i - 1)) * shift[1] + 2.0;
+		shift[0] = -1 * pow(2, (i - 1)) + 2.0;
+		shift[1] = -1 * pow(2, (i - 1)) + 2.0;
 
 		L = pow(2, i);
 
@@ -56,7 +56,7 @@ Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 	shift[1] = 1.0;
 
 	Matrix* symetxX = symext(x, g0, shift);
-	Matrix* symetxY = symext(y->mats[NLevels], g0, shift);
+	Matrix* symetxY = symext(y->mats[NLevels], g1, shift);
 
 	Matrix* conv2X = Conv2(symetxX, g0, "valid");
 	Matrix* conv2Y = Conv2(symetxY, g1, "valid");

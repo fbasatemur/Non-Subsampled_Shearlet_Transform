@@ -16,7 +16,7 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lp
 	dst->mats[0] = y->mats[0];
 
 	Cont* shearF = new Cont(level);
-	shearF->CreateCells();
+	// shearF->CreateCells();
 
 	Matrix* temp;
 	for (int i = 0; i < level; i++)
@@ -31,6 +31,8 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lp
 			shearF->mats[i][k] = ScalarMatMul(temp[k], sqrt(shearParam.dsize[i]));
 			dst->mats[i + 1][k] = Conv2(y->mats[i + 1], shearF->mats[i][k], "same");
 		}	
+
+		dst->mats[i + 1]->depth = size;
 	}
 	return dst;
 }

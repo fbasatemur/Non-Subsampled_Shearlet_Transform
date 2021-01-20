@@ -12,12 +12,12 @@ inline double realmod(double x, double y)
 	return result >= 0 ? result : result + y;
 }
 
-Matrix* Sum(Matrix* mat, int dim) {
+Matrix* Sum(Matrix* mats, int dim) {
 
-	int imageSize = mat->GetSize2D();
+	int imageSize = mats->GetSize2D();
 
 	Matrix* retMat = new Matrix;
-	retMat->CreateMatrix(mat->height, mat->width, 1);
+	retMat->CreateMatrix(mats->height, mats->width, 1);
 
 	double total = 0.0;
 
@@ -31,8 +31,8 @@ Matrix* Sum(Matrix* mat, int dim) {
 		for (int i = 0; i < imageSize; i++) {
 
 			total = 0.0;
-			for (int d = 0; d < mat->depth; d++)
-				total += mat->mat[d * imageSize + i];
+			for (int d = 0; d < mats->depth; d++)
+				total += mats[d].mat[i];
 			retMat->mat[i] = total;
 		}
 		
@@ -63,7 +63,8 @@ double* Eye(int size) {
 
 Matrix* EyeMatrix(int size) {
 
-	Matrix* identityMat = new Matrix(size, size, 1);
+	Matrix* identityMat = new Matrix;
+	identityMat->CreateMatrix(size, size, 1);
 
 	for (int row = 0; row < size; row++) {
 		for (int col = 0; col < size; col++) {
@@ -87,21 +88,8 @@ double* ones(int width, int height)
 	return onesMat;
 }
 
-//double* zeros(int width, int height)
-//{
-//	double* zerosMat = new double[width * height];
-//	for (int i = 0; i < width * height; i++)
-//		zerosMat[i] = 0.0;
-//
-//	return zerosMat;
-//}
-
 double* zeros(int width, int height, int depth)
 {
-	//double* zerosMat = new double[width * height * depth];
-	//for (int i = 0; i < height * width * depth; i++)
-	//	zerosMat[i] = 0.0;
-
 	return (double*)calloc(width * height * depth, sizeof(double));
 }
 
