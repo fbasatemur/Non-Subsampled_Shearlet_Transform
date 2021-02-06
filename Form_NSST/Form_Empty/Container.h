@@ -7,10 +7,10 @@ public:
 	int height;
 	int width;
 	int depth;
-	double* mat;
+	float* mat;
 
 	Matrix(){}
-	~Matrix() {}
+	~Matrix() { delete[] mat; }
 	
 	Matrix(int height, int width, int depth = 1) {
 		this->height = height;
@@ -23,7 +23,7 @@ public:
 		this->height = height;
 		this->width = width;
 		this->depth = depth;
-		mat = new double[height * width * depth];
+		mat = new float[height * width * depth]();
 	}
 
 	int GetSize2D() { return height * width; }
@@ -43,7 +43,7 @@ public:
 		return temp;
 	}
 
-	Matrix* operator*(double L) {
+	Matrix* operator*(float L) {
 		
 		Matrix* temp = new Matrix;
 		temp->CreateMatrix(this->height, this->width, this->depth);
@@ -56,7 +56,7 @@ public:
 		return temp;
 	}
 
-	void operator/=(double L) {
+	void operator/=(float L) {
 
 		for (int i = 0; i < this->GetSize3D(); i++)
 		{
@@ -66,23 +66,18 @@ public:
 
 };
 
-// Cont -> Container class
+// Cont => Container class
 class Cont {
 
 public:
 	Matrix** mats;
 	int matNums;
 
+	Cont() {}
+
 	Cont(int cellNums) {
 		this->matNums = cellNums;
 		mats = new Matrix*[cellNums];
-	}
-
-	void CreateCells() {
-		for (int i = 0; i < matNums; i++)
-		{
-			mats[i] = new Matrix;
-		}
 	}
 
 	void CreateCells(int index, int size) {
@@ -91,9 +86,13 @@ public:
 
 	~Cont(){
 
-		for (int i = 0; i < matNums; i++)
-			delete[] mats[i];
+		int depth;
+		for (size_t cell = 0; cell < matNums; cell++) {
 
+			depth = mats[cell]->depth;
+			for (size_t d = 0; d < depth; d++)
+				delete[] mats[cell][d].mat;
+		}
 		delete[] mats;
 	}
 };

@@ -3,13 +3,15 @@
 #include <atlstr.h>
 #include "Image.h"
 #include "Process.h"
-#include <msclr\marshal_cppstd.h>
 #include <fstream>
 
 #include "ShearParameters.h"
 #include "Container.h"
 #include "NsstDec.h"
 #include "NsstRec.h"
+#include "MatlabFuncs.h"
+#include "NSSTFuncs.h"
+
 
 namespace Form_Empty {
 
@@ -88,6 +90,7 @@ namespace Form_Empty {
 			// openFileDialog1
 			// 
 			this->openFileDialog1->FileName = L"openFileDialog1";
+			//this->openFileDialog1->Filter = L"bmp files (*.bmp)|*.bmp";
 			// 
 			// menuStrip1
 			// 
@@ -103,7 +106,7 @@ namespace Form_Empty {
 			// 
 			this->openToolStripMenuItem->DropDownItems->AddRange(gcnew cli::array< System::Windows::Forms::ToolStripItem^  >(1) { this->openToolStripMenuItem1 });
 			this->openToolStripMenuItem->Name = L"openToolStripMenuItem";
-			this->openToolStripMenuItem->Size = System::Drawing::Size(46, 24);
+			this->openToolStripMenuItem->Size = System::Drawing::Size(46, 26);
 			this->openToolStripMenuItem->Text = L"File";
 			// 
 			// openToolStripMenuItem1
@@ -154,18 +157,18 @@ namespace Form_Empty {
 			this->label2->AutoSize = true;
 			this->label2->Location = System::Drawing::Point(12, 59);
 			this->label2->Name = L"label2";
-			this->label2->Size = System::Drawing::Size(99, 17);
+			this->label2->Size = System::Drawing::Size(81, 17);
 			this->label2->TabIndex = 5;
-			this->label2->Text = L"Original Image";
+			this->label2->Text = L"Input Image";
 			// 
 			// label3
 			// 
 			this->label3->AutoSize = true;
 			this->label3->Location = System::Drawing::Point(525, 59);
 			this->label3->Name = L"label3";
-			this->label3->Size = System::Drawing::Size(27, 17);
+			this->label3->Size = System::Drawing::Size(139, 17);
 			this->label3->TabIndex = 6;
-			this->label3->Text = L"XR";
+			this->label3->Text = L"Inverse NSST Result";
 			// 
 			// MyForm
 			// 
@@ -196,121 +199,80 @@ namespace Form_Empty {
 
 		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
-			//long size;
-			//BYTE* buffer, *raw_intensity;
+			long size;
+			BYTE* buffer;
 			int width, height;
-			CString str = openFileDialog1->FileName;
+			const char* lpfilt = "maxflat";
 
-			int displayFlag = 1;
+			ShearParameters shearParameters;
+			shearParameters.dcompSize = 4;						// K => numbers of YFK
+			shearParameters.dcomp = new int[4]{3, 3, 4, 4};
+			shearParameters.dsize = new int[4]{32, 32, 16, 16};
 
-			// LoadBMP can read only 24 bit image depth
-			/*buffer = LoadBMP(width, height, size, (LPCTSTR)str);
-			raw_intensity = ConvertBMPToIntensity(buffer, width, height);*/
 
-			width = 512;
-			height = 512;
-
-			std::ifstream file(str);
+			/*width = 320;
+			height = 240;
+			CString path = openFileDialog1->FileName;
+			std::ifstream file(path);
 			Matrix* image = new Matrix;
 			image->CreateMatrix(height, width, 1);
 
 			if (file.is_open()) {
-				double temp;
+				float temp;
 				for (int i = 0; i < height * width; i++) {
 					file >> temp;
 					image->mat[i] = temp;
 				}
 			}
+			file.close();*/
 
-			file.close();
+			
+			CString path = openFileDialog1->FileName; 
+			// LoadBMP can read only 24 bit image depth
+			buffer = LoadBMP(width, height, size, (LPCTSTR)path);
+			// Intensity image form
+			float* intensity = ConvertBMPToIntensity(buffer, width, height);
 
-			const char* lpfilt = "maxflat";
-			ShearParameters shearParameters;
-
-			shearParameters.dcompSize = 4;
-			shearParameters.dcomp = new int[4];
-			shearParameters.dcomp[0] = 3;
-			shearParameters.dcomp[1] = 3;
-			shearParameters.dcomp[2] = 4;
-			shearParameters.dcomp[3] = 4;
-
-			shearParameters.dsize = new int[4];
-			shearParameters.dsize[0] = 32;
-			shearParameters.dsize[1] = 32;
-			shearParameters.dsize[2] = 16;
-			shearParameters.dsize[3] = 16;
-
-			int shearVersion = 0;			// nsst_dec1e
-			//int shear_version = 1;		// nsst_dec1
-			//int shear_version = 2;		// nsst_dec2
+			Matrix* image = new Matrix(height, width, 1);
+			image->mat = intensity;								// I => Intensity
 
 
-			Cont* dst;
-			switch (shearVersion)
-			{
-			case 0:
-				// [dst,shear_f]=nsst_dec1e(image,shear_parameters,lpfilt);
-				dst = NsstDec1e(image, shearParameters, lpfilt);			// dst->mats[cellIndex][deepIndex]
-				break;
-
-			case 1:
-				// [dst, shear_f] = nsst_dec1(image, shear_parameters, lpfilt);
-				break;
-
-			case 2:
-				// [dst,shear_f]=nsst_dec2(image,shear_parameters,lpfilt);
-				break;
-			default:
-				break;
-			}
+			// NSST - Non Subsampled Shearlet Transform
+			Cont* dst = NsstDec1e(image, shearParameters, lpfilt);
+			/*	INFO
+				dst->mats[cellIndex][deepIndex]
+				dst->mats[0][0]			=> AFK is 1 piece and deep	 => 1
+				dst->mats[1..4][deep]	=> YFK is 4 pieces and deeps => {8, 8, 16, 16} 
+			*/
+					
+			// Inverse NSST
+			Matrix* inverseNSST = NsstRec1(dst, lpfilt);
 
 
-			Matrix* xr;
-			switch (shearVersion)
-			{
-			case 0:
-				xr = NsstRec1(dst, lpfilt);
-				break;
-
-			case 1:
-				//	xr = nsst_rec1(dst, lpfilt);
-				break;
-
-			case 2:
-				// xr = nsst_rec2(dst, shear_f, lpfilt);
-				break;
-			default:
-				break;
-			}
-
-
-
-			// display result
-
-			Bitmap^ surface1 = gcnew Bitmap(width, height);
+			// display Inverse NSST result
 			Bitmap^ surface2 = gcnew Bitmap(width, height);
-			pictureBox1->Image = surface1;		// Original image
-			pictureBox2->Image = surface2;		// NSST image
-			Color c1, c2;
+			pictureBox2->Image = surface2;		// Inverse NSST image
+			Color c2;
 
+			float* inverse = inverseNSST->mat;
+
+			long pos;
 			for (int row = 0; row < height; row++)
 				for (int col = 0; col < width; col++) {
+					pos = row * width + col;
 
-					c1 = Color::FromArgb((int)image->mat[row * width + col], (int)image->mat[row * width + col], (int)image->mat[row * width + col]);
-					surface1->SetPixel(col, row, c1);
-
-					c2 = Color::FromArgb((int)ceil(xr->mat[row * width + col]), (int)ceil(xr->mat[row * width + col]), (int)ceil(xr->mat[row * width + col]));
+					// result valuation rounding is applied
+					c2 = Color::FromArgb(round(inverse[pos]), round(inverse[pos]), round(inverse[pos]));
 					surface2->SetPixel(col, row, c2);
 				}
 
+			pictureBox1->ImageLocation = openFileDialog1->FileName;
+			labelPath->Text = pictureBox1->ImageLocation;
 
-			pictureBox1->Refresh();
-			pictureBox2->Refresh();
-			//pictureBox1->ImageLocation = openFileDialog1->FileName;
-			//labelPath->Text = pictureBox1->ImageLocation;
-
-			/*delete[] buffer;
-			delete[] raw_intensity;*/
+			delete dst;
+			delete inverseNSST;
+			delete[] intensity;
+			delete[] buffer;
 		}
 	}
 	};

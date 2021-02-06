@@ -64,7 +64,7 @@ BYTE* LoadBMP(int% width, int% height, long% size, LPCTSTR bmpfile)
 
 	return Buffer;
 }//LoadBMP
-BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
+float* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 {
 	// first make sure the parameters are valid
 	if ((NULL == Buffer) || (width == 0) || (height == 0))
@@ -80,7 +80,7 @@ BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 	int psw = scanlinebytes + padding;
 
 	// create new buffer
-	BYTE* newbuf = new BYTE[width * height];
+	float* newbuf = new float[width * height];
 
 	// now we loop trough all bytes of the original buffer, 
 	// swap the R and B bytes and the scanlines
@@ -90,11 +90,73 @@ BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 		for (int column = 0; column < width; column++) {
 			newpos = row * width + column;
 			bufpos = (height - row - 1) * psw + column * 3;
-			newbuf[newpos] = (BYTE)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
+			/*
+				Buffer[bufpos]	   => Blue
+				Buffer[bufpos + 1] => Green
+				Buffer[bufpos + 2] => Red
+			*/
+
+			newbuf[newpos] = (float)(int)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
 		}
 
 	return newbuf;
-}//ConvertToBMTToIntensity(..)
+}
+
+
+float* ConvertBMPToYCbCr(BYTE* Buffer, int width, int height)
+{
+	// first make sure the parameters are valid
+	if ((NULL == Buffer) || (width == 0) || (height == 0))
+		return NULL;
+
+	// find the number of padding bytes
+
+	int padding = 0;
+	int scanlinebytes = width * 3;
+	while ((scanlinebytes + padding) % 4 != 0)     // DWORD = 4 bytes
+		padding++;
+	// get the padded scanline width
+	int psw = scanlinebytes + padding;
+
+	// create new buffer
+	float* newbuf = new float[width * height * 3];
+	int imgsize = width * height;
+	// now we loop trough all bytes of the original buffer, 
+	// swap the R and B bytes and the scanlines
+	long bufpos = 0;
+	long newpos = 0;
+
+	BYTE red, green, blue;
+
+	for (int row = 0; row < height; row++)
+		for (int column = 0; column < width; column++) {
+			newpos = row * width + column;
+			bufpos = (height - row - 1) * psw + column * 3;
+			/*
+				Buffer[bufpos]	   => Blue
+				Buffer[bufpos + 1] => Green
+				Buffer[bufpos + 2] => Red
+			*/
+
+			blue = Buffer[bufpos];
+			green = Buffer[bufpos + 1];
+			red = Buffer[bufpos + 2];
+
+			//// ITU-R BT.601 conversion between[16..240]
+			newbuf[newpos] = (float)(16 + 0.257 * red + 0.504 * green +  0.098 * blue);						// Y  => Intensity
+			newbuf[newpos + imgsize] = (float)(128 - 0.148 * red - 0.291 * green + 0.439 * blue);			// Cb => X
+			newbuf[newpos + imgsize * 2] = (float)(128 + 0.439 * red - 0.368 * green - 0.071 * blue);		// Cr => Y
+
+			// JPEG standard
+			//newbuf[newpos] = (float)(0.299 * red + 0.587 * green + 0.114 * blue);							// Y  => Intensity
+			//newbuf[newpos + imgsize] = (float)(128 - 0.168736 * red - 0.331264 * green + 0.5 * blue);		// Cb => X
+			//newbuf[newpos + imgsize * 2] = (float)(128 + 0.5 * red - 0.418688 * green - 0.081312 * blue);	// Cr => Y
+		}
+	
+	return newbuf;
+}
+
+//ConvertToBMTToIntensity(..)
 BYTE* ConvertIntensityToBMP(BYTE* Buffer, int width, int height, long% newsize)
 {
 	// first make sure the parameters are valid

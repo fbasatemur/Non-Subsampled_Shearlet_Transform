@@ -6,16 +6,16 @@
 
 
 /************************************************************************
-  fft(int n, double xRe[], double xIm[], double yRe[], double yIm[])
+  fft(int n, float xRe[], float xIm[], float yRe[], float yIm[])
  ------------------------------------------------------------------------
   NOTE : This is copyrighted material, Not public domain. See below.
  ------------------------------------------------------------------------
   Input/output:
 	  int n          transformation length.
-	  double xRe[]   real part of input sequence.
-	  double xIm[]   imaginary part of input sequence.
-	  double yRe[]   real part of output sequence.
-	  double yIm[]   imaginary part of output sequence.
+	  float xRe[]   real part of input sequence.
+	  float xIm[]   imaginary part of input sequence.
+	  float yRe[]   real part of output sequence.
+	  float yIm[]   imaginary part of output sequence.
  ------------------------------------------------------------------------
   Function:
 	  The procedure performs a fast discrete Fourier transform (FFT) of
@@ -90,26 +90,26 @@
 #define  maxPrimeFactorDiv2    (maxPrimeFactor+1)/2
 #define  maxFactorCount        20
 
-static double  c3_1 = -1.5000000000000E+00;  /*  c3_1 = cos(2*pi/3)-1;          */
-static double  c3_2 = 8.6602540378444E-01;  /*  c3_2 = sin(2*pi/3);            */
+static float  c3_1 = -1.5000000000000E+00;  /*  c3_1 = cos(2*pi/3)-1;          */
+static float  c3_2 = 8.6602540378444E-01;  /*  c3_2 = sin(2*pi/3);            */
 
-static double  u5 = 1.2566370614359E+00;  /*  u5   = 2*pi/5;                 */
-static double  c5_1 = -1.2500000000000E+00;  /*  c5_1 = (cos(u5)+cos(2*u5))/2-1;*/
-static double  c5_2 = 5.5901699437495E-01;  /*  c5_2 = (cos(u5)-cos(2*u5))/2;  */
-static double  c5_3 = -9.5105651629515E-01;  /*  c5_3 = -sin(u5);               */
-static double  c5_4 = -1.5388417685876E+00;  /*  c5_4 = -(sin(u5)+sin(2*u5));   */
-static double  c5_5 = 3.6327126400268E-01;  /*  c5_5 = (sin(u5)-sin(2*u5));    */
-static double  c8 = 7.0710678118655E-01;  /*  c8 = 1/sqrt(2);    */
+static float  u5 = 1.2566370614359E+00;  /*  u5   = 2*pi/5;                 */
+static float  c5_1 = -1.2500000000000E+00;  /*  c5_1 = (cos(u5)+cos(2*u5))/2-1;*/
+static float  c5_2 = 5.5901699437495E-01;  /*  c5_2 = (cos(u5)-cos(2*u5))/2;  */
+static float  c5_3 = -9.5105651629515E-01;  /*  c5_3 = -sin(u5);               */
+static float  c5_4 = -1.5388417685876E+00;  /*  c5_4 = -(sin(u5)+sin(2*u5));   */
+static float  c5_5 = 3.6327126400268E-01;  /*  c5_5 = (sin(u5)-sin(2*u5));    */
+static float  c8 = 7.0710678118655E-01;  /*  c8 = 1/sqrt(2);    */
 
-static double   pi;
+static float   pi;
 static int      groupOffset, dataOffset, blockOffset, adr;
 static int      groupNo, dataNo, blockNo, twNo;
-static double   omega, tw_re, tw_im;
-static double   twiddleRe[maxPrimeFactor], twiddleIm[maxPrimeFactor],
+static float   omega, tw_re, tw_im;
+static float   twiddleRe[maxPrimeFactor], twiddleIm[maxPrimeFactor],
 trigRe[maxPrimeFactor], trigIm[maxPrimeFactor],
 zRe[maxPrimeFactor], zIm[maxPrimeFactor];
-static double   vRe[maxPrimeFactorDiv2], vIm[maxPrimeFactorDiv2];
-static double   wRe[maxPrimeFactorDiv2], wIm[maxPrimeFactorDiv2];
+static float   vRe[maxPrimeFactorDiv2], vIm[maxPrimeFactorDiv2];
+static float   wRe[maxPrimeFactorDiv2], wIm[maxPrimeFactorDiv2];
 
 void factorize(int n, int* nFact, int fact[])
 {
@@ -211,7 +211,7 @@ void transTableSetup(int sofar[], int actual[], int remain[], int* nFact, int* n
   normal order.
  ****************************************************************************/
 
-void permute(int nPoint, int nFact, int fact[], int remain[], double xRe[], double xIm[], double yRe[], double yIm[])
+void permute(int nPoint, int nFact, int fact[], int remain[], float xRe[], float xIm[], float yRe[], float yIm[])
 {
 	int i, j, k;
 	int count[maxFactorCount];
@@ -237,7 +237,7 @@ void permute(int nPoint, int nFact, int fact[], int remain[], double xRe[], doub
 	yIm[nPoint - 1] = xIm[nPoint - 1];
 }   /* permute */
 
-void Ipermute(int nPoint, int nFact, int fact[], int remain[], double xRe[], double xIm[], double yRe[], double yIm[])
+void Ipermute(int nPoint, int nFact, int fact[], int remain[], float xRe[], float xIm[], float yRe[], float yIm[])
 {
 	int i, j, k;
 	int count[maxFactorCount];
@@ -273,7 +273,7 @@ void Ipermute(int nPoint, int nFact, int fact[], int remain[], double xRe[], dou
 void initTrig(int radix)
 {
 	int i;
-	double w, xre, xim;
+	float w, xre, xim;
 
 	w = 2 * pi / radix;
 	trigRe[0] = 1; trigIm[0] = 0;
@@ -287,10 +287,10 @@ void initTrig(int radix)
 	}
 }   /* initTrig */
 
-void fft_4(double aRe[], double aIm[])
+void fft_4(float aRe[], float aIm[])
 {
-	double  t1_re, t1_im, t2_re, t2_im;
-	double  m2_re, m2_im, m3_re, m3_im;
+	float  t1_re, t1_im, t2_re, t2_im;
+	float  m2_re, m2_im, m3_re, m3_im;
 
 	t1_re = aRe[0] + aRe[2]; t1_im = aIm[0] + aIm[2];
 	t2_re = aRe[1] + aRe[3]; t2_im = aIm[1] + aIm[3];
@@ -305,14 +305,14 @@ void fft_4(double aRe[], double aIm[])
 }   /* fft_4 */
 
 
-void fft_5(double aRe[], double aIm[])
+void fft_5(float aRe[], float aIm[])
 {
-	double  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
-	double  t4_re, t4_im, t5_re, t5_im;
-	double  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
-	double  m1_re, m1_im, m5_re, m5_im;
-	double  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
-	double  s4_re, s4_im, s5_re, s5_im;
+	float  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
+	float  t4_re, t4_im, t5_re, t5_im;
+	float  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
+	float  m1_re, m1_im, m5_re, m5_im;
+	float  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
+	float  s4_re, s4_im, s5_re, s5_im;
 
 	t1_re = aRe[1] + aRe[4]; t1_im = aIm[1] + aIm[4];
 	t2_re = aRe[2] + aRe[3]; t2_im = aIm[2] + aIm[3];
@@ -341,7 +341,7 @@ void fft_5(double aRe[], double aIm[])
 
 void fft_8()
 {
-	double  aRe[4], aIm[4], bRe[4], bIm[4], gem;
+	float  aRe[4], aIm[4], bRe[4], bIm[4], gem;
 
 	aRe[0] = zRe[0];    bRe[0] = zRe[1];
 	aRe[1] = zRe[2];    bRe[1] = zRe[3];
@@ -378,7 +378,7 @@ void fft_8()
 
 void fft_10()
 {
-	double  aRe[5], aIm[5], bRe[5], bIm[5];
+	float  aRe[5], aIm[5], bRe[5], bIm[5];
 
 	aRe[0] = zRe[0];    bRe[0] = zRe[5];
 	aRe[1] = zRe[2];    bRe[1] = zRe[7];
@@ -409,7 +409,7 @@ void fft_10()
 
 void fft_odd(int radix)
 {
-	double  rere, reim, imre, imim;
+	float  rere, reim, imre, imim;
 	int     i, j, k, n, max;
 
 	n = radix;
@@ -453,19 +453,19 @@ void fft_odd(int radix)
 }   /* fft_odd */
 
 
-void twiddleTransf(int sofarRadix, int radix, int remainRadix, double yRe[], double yIm[])
+void twiddleTransf(int sofarRadix, int radix, int remainRadix, float yRe[], float yIm[])
 {   /* twiddleTransf */
-	double  cosw, sinw, gem;
-	double  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
-	double  t4_re, t4_im, t5_re, t5_im;
-	double  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
-	double  m1_re, m1_im, m5_re, m5_im;
-	double  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
-	double  s4_re, s4_im, s5_re, s5_im;
+	float  cosw, sinw, gem;
+	float  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
+	float  t4_re, t4_im, t5_re, t5_im;
+	float  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
+	float  m1_re, m1_im, m5_re, m5_im;
+	float  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
+	float  s4_re, s4_im, s5_re, s5_im;
 
 
 	initTrig(radix);
-	omega = 2 * pi / (double)(sofarRadix * radix);
+	omega = 2 * pi / (float)(sofarRadix * radix);
 	cosw = cos(omega);
 	sinw = -sin(omega);
 	tw_re = 1.0;
@@ -587,19 +587,19 @@ void twiddleTransf(int sofarRadix, int radix, int remainRadix, double yRe[], dou
 	}
 }   /* twiddleTransf */
 
-void ItwiddleTransf(int sofarRadix, int radix, int remainRadix, double yRe[], double yIm[])
+void ItwiddleTransf(int sofarRadix, int radix, int remainRadix, float yRe[], float yIm[])
 {   /* twiddleTransf */
-	double  cosw, sinw, gem;
-	double  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
-	double  t4_re, t4_im, t5_re, t5_im;
-	double  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
-	double  m1_re, m1_im, m5_re, m5_im;
-	double  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
-	double  s4_re, s4_im, s5_re, s5_im;
+	float  cosw, sinw, gem;
+	float  t1_re, t1_im, t2_re, t2_im, t3_re, t3_im;
+	float  t4_re, t4_im, t5_re, t5_im;
+	float  m2_re, m2_im, m3_re, m3_im, m4_re, m4_im;
+	float  m1_re, m1_im, m5_re, m5_im;
+	float  s1_re, s1_im, s2_re, s2_im, s3_re, s3_im;
+	float  s4_re, s4_im, s5_re, s5_im;
 
 
 	initTrig(radix);
-	omega = 2 * pi / (double)(sofarRadix * radix);
+	omega = 2 * pi / (float)(sofarRadix * radix);
 	cosw = cos(omega);
 	sinw = -sin(omega);
 	tw_re = 1.0;
@@ -721,7 +721,7 @@ void ItwiddleTransf(int sofarRadix, int radix, int remainRadix, double yRe[], do
 	}
 }   /* twiddleTransf */
 
-void fft(int n, double* xRe, double* xIm, double* yRe, double* yIm)
+void fft(int n, float* xRe, float* xIm, float* yRe, float* yIm)
 {
 	int   sofarRadix[maxFactorCount], actualRadix[maxFactorCount], remainRadix[maxFactorCount];
 	int   nFactor;
@@ -737,7 +737,7 @@ void fft(int n, double* xRe, double* xIm, double* yRe, double* yIm)
 			yRe, yIm);
 }   /* fft */
 
-void ifft(int n, double* xRe, double* xIm, double* yRe, double* yIm)
+void ifft(int n, float* xRe, float* xIm, float* yRe, float* yIm)
 {
 	int   sofarRadix[maxFactorCount],
 		actualRadix[maxFactorCount],

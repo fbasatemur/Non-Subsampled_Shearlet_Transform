@@ -2,15 +2,15 @@
 #include "Process.h"
 #include "FFT.h"
 
-void FFT2D(double* img, double* Output_real, double* Output_img, int width, int height)
+void FFT2D(float* img, float* Output_real, float* Output_img, int width, int height)
 {
 	int i, j;
-	double* input_real = new double[width];
-	double* input_im = new double[width];
-	double* out_real = new double[width];
-	double* out_im = new double[width];
-	double* Real = new double[width * height];
-	double* Im = new double[width * height];
+	float* input_real = new float[width];
+	float* input_im = new float[width];
+	float* out_real = new float[width];
+	float* out_im = new float[width];
+	float* Real = new float[width * height];
+	float* Im = new float[width * height];
 
 	for (j = 0; j < width; j++)
 		input_im[j] = 0.0;
@@ -28,10 +28,10 @@ void FFT2D(double* img, double* Output_real, double* Output_img, int width, int 
 	delete[] input_real;
 	delete[] out_real;
 	delete[] out_im;
-	input_real = new double[height];
-	input_im = new double[height];
-	out_real = new double[height];
-	out_im = new double[height];
+	input_real = new float[height];
+	input_im = new float[height];
+	out_real = new float[height];
+	out_im = new float[height];
 	for (j = 0; j < width; j++) {
 		for (i = 0; i < height; i++) {
 			input_real[i] = Real[i * width + j];
@@ -53,15 +53,15 @@ void FFT2D(double* img, double* Output_real, double* Output_img, int width, int 
 }//FFT2D
 
 // Inverse FFT kodu
-void IFFT2D(double* Output_real, double* Output_imag, double* Input_real, double* Input_imag, int width, int height)
+void IFFT2D(float* Output_real, float* Output_imag, float* Input_real, float* Input_imag, int width, int height)
 {
 	int i, j;
-	double* In_re, * In_im, * O_re, * O_im;
+	float* In_re, * In_im, * O_re, * O_im;
 
-	In_re = new double[width];
-	In_im = new double[width];
-	O_re = new double[width];
-	O_im = new double[width];
+	In_re = new float[width];
+	In_im = new float[width];
+	O_re = new float[width];
+	O_im = new float[width];
 	for (i = 0; i < height; i++) {
 		for (j = 0; j < width; j++) {
 			In_re[j] = Input_real[i * width + j];
@@ -74,10 +74,10 @@ void IFFT2D(double* Output_real, double* Output_imag, double* Input_real, double
 		}
 	}
 	delete[] In_re; delete[] In_im; delete[] O_re; delete[] O_im;
-	In_re = new double[height];
-	In_im = new double[height];
-	O_re = new double[height];
-	O_im = new double[height];
+	In_re = new float[height];
+	In_im = new float[height];
+	O_re = new float[height];
+	O_im = new float[height];
 
 	for (j = 0; j < width; j++)
 	{

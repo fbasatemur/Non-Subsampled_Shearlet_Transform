@@ -10,9 +10,6 @@
     <ClCompile Include="Process.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="AtrousFilters.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
     <ClCompile Include="FFT.cpp">
       <Filter>Source</Filter>
     </ClCompile>
@@ -25,13 +22,7 @@
     <ClCompile Include="MyForm.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="AtrousDec.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Atrousc.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="AtrousRec.cpp">
+    <ClCompile Include="NSSTFuncs.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -61,16 +52,7 @@
     <ClInclude Include="Container.h">
       <Filter>Header</Filter>
     </ClInclude>
-    <ClInclude Include="AtrousDec.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AtrousFilters.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="Atrousc.h">
-      <Filter>Header</Filter>
-    </ClInclude>
-    <ClInclude Include="AtrousRec.h">
+    <ClInclude Include="NSSTFuncs.h">
       <Filter>Header</Filter>
     </ClInclude>
   </ItemGroup>
