@@ -112,7 +112,7 @@ Matrix* Atrousc(Matrix* signal, Matrix* filter, float* upMatrix);
 ///		<para></para>
 ///		y->[1..4] => HFC (High frequency coefficients)
 /// </returns>
-Cont* AtrousDec(Matrix* image, const char* lpfilt, int level);
+Cont* AtrousDec(Matrix* image, Cont* filters, int level);
 
 /// <summary>
 ///		ATROUSFILTERS	Generate pyramid 2D filters

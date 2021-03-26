@@ -4,7 +4,6 @@
 #define PI           3.14159265358979323846
 #define LINPOS(row,col,collen) (row*collen)+col
 
-
 float* Linspace(int d1, int d2, int N)
 {
 	float a1 = d1, a2 = d2;
@@ -50,9 +49,8 @@ Matrix* Upsample2df(const Matrix* h, int power) {
 	int height = pow(2, power) * h->height;
 	int width = pow(2, power) * h->width;
 
-	Matrix* ho = new Matrix;
+	Matrix* ho = new Matrix(height, width);
 	ho->mat = zeros(width, height);
-	ho->width = width; ho->height = height; ho->depth = 1;
 
 	int step = pow(2, power);
 	int hStep = 0;
@@ -154,17 +152,17 @@ Matrix* GenXYCoordinates(int n)
 		}
 
 	//correct for portion outside boundry
-	x1n = Flipud(x1n, n, n);
+	float* x1n_ = Flipud(x1n, n, n); delete[] x1n;
 	y2n[(n - 1) * n] = n;
 
 	// return [x1n,y1n,x2n,y2n,D]
 	Matrix* ret = new Matrix[5];
-	ret[0].mat = x1n; ret[0].width = n; ret[0].height = n; ret[0].depth = 1;
+	ret[0].mat = x1n_; ret[0].width = n; ret[0].height = n; ret[0].depth = 1;
 	ret[1].mat = y1n; ret[1].width = n; ret[1].height = n; ret[0].depth = 1;
 	ret[2].mat = x2n; ret[2].width = n; ret[2].height = n; ret[0].depth = 1;
 	ret[3].mat = y2n; ret[3].width = n; ret[3].height = n; ret[0].depth = 1;
 
-	ret[4].mat = AvgPol(n, x1n, y1n, x2n, y2n);
+	ret[4].mat = AvgPol(n, x1n_, y1n, x2n, y2n);
 	ret[4].width = n; ret[4].height = n;
 
 	delete[] x1; delete[] y1; delete[] x2; delete[] y2; delete[] xt; delete[] m;
@@ -203,10 +201,11 @@ Matrix* RecFromPol(Matrix* l, int n, Matrix* gen)
 			C[offset] += l->mat[(i + n) * n + j];
 		}
 
-	C = RDivide(C, gen[4].mat, n * n);
+	float* retC = RDivide(C, gen[4].mat, n * n);
+	delete[] C;
 
 	Matrix* matC = new Matrix(n, n, 1);
-	matC->mat = C;
+	matC->mat = retC;
 
 	return matC;
 }
@@ -309,7 +308,9 @@ Matrix* ShearingFiltersMyer(int n, int level)
 	//Pseudo-polar koordinat sistemi için indexlerin uretilmesi
 	//gen : [x11, y11, x12, y12, F1]
 	Matrix* gen = GenXYCoordinates(n);
-	Matrix* wf = Windowing(ones(2 * n, 1), 2 * n, pow(2, level));
+	float* ones_ = ones(2 * n, 1);
+	Matrix* wf = Windowing(ones_, 2 * n, pow(2, level));
+	delete[] ones_;
 
 	int size = pow(2, level);
 
@@ -321,12 +322,15 @@ Matrix* ShearingFiltersMyer(int n, int level)
 	float* outReal = zeros(n, n);
 	float* outImag = zeros(n, n);
 
+	Matrix* temp, * temp2;
 	for (int i = 0; i < size; i++)
 	{
-		Matrix* temp = MatrixCut(wf->mat, wf->height, wf->width, 0, wf->height - 1, i, i);
-		temp->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, 1, n);
+		temp = MatrixCut(wf->mat, wf->height, wf->width, 0, wf->height - 1, i, i);
 
-		wS[i] = *RecFromPol(temp, n, gen);
+		temp2 = new Matrix(temp->height, temp->width);
+		temp2->mat = MatrixMultiplication(temp->mat, temp->height, temp->width, one, 1, n);
+
+		wS[i] = *RecFromPol(temp2, n, gen);
 
 		// w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
 
@@ -339,10 +343,10 @@ Matrix* ShearingFiltersMyer(int n, int level)
 
 		wS[i] /= (float)sqrt(n);												// real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
 
-		delete temp; delete[] fftS1;
+		delete temp; delete[] fftS1; delete temp2;
 	}
 
-	delete[] one; delete[] outReal; delete[] outImag;  delete[] inImag;
+	delete[] one; delete[] outReal; delete[] outImag; delete[] inImag;
 	delete[] gen; delete wf;
 
 	return wS;
@@ -382,28 +386,44 @@ Matrix* symext(Matrix* x, Matrix* h, float* shift)
 	float ss = p2 - s1 + 1;
 	float rr = q2 - s2 + 1;
 
-	Matrix* yT, * temp, * extentedMatrix;
 
+	// returnleri incele, parametleri sil
+	Matrix* yT, * temp, *temp2,* extentedMatrix;
+	float* lr;
+
+	
 	//[fliplr(x(:,1:ss)) x  x(:,n  :-1: n-p-s1+1)]
 	temp = MatrixCut(x->mat, x->height, x->width, 0, x->height - 1, 0, ss - 1); // x(:,1:ss)
-	temp->mat = Fliplr(temp->mat, temp->height, temp->width);// fliplr(x(:,1:ss))
-	extentedMatrix = MatrixColExtend(temp->mat, temp->height, temp->width, x->mat, x->height, x->width);
+	
+	temp2 = new Matrix(temp->height, temp->width);
+	temp2->mat = Fliplr(temp->mat, temp->height, temp->width);// fliplr(x(:,1:ss))
+	extentedMatrix = MatrixColExtend(temp2->mat, temp->height, temp->width, x->mat, x->height, x->width);
+	delete temp; delete temp2;
+
 	temp = MatrixCut(x->mat, x->height, x->width, 0, x->height - 1, n - 1, n - p - s1 + 1 - 1, 1, -1); // x(:, n : -1 : n - p - s1 + 1)
 	yT = MatrixColExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
+	delete temp;
 
 	//[flipud(yT(1:rr, : )); yT;  yT(m  :-1 : m - q - s2 + 1, : )]
 	temp = MatrixCut(yT->mat, yT->height, yT->width, 0, rr - 1, 0, yT->width - 1); //yT(1:rr, : )
-	temp->mat = Flipud(temp->mat, temp->height, temp->width);		//flipud(yT(1:rr, : ))
-	extentedMatrix = MatrixRowExtend(temp->mat, temp->height, temp->width, yT->mat, yT->height, yT->width);
-	temp = MatrixCut(yT->mat, yT->height, yT->width, m - 1, m - q - s2 + 1 - 1, 0, yT->width - 1, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
-	yT = MatrixRowExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
-
-	// yT(1:m+p-1 ,1:n+q-1) 
-	yT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1 - 1, 0, n + q - 1 - 1);
-
+	temp2 = new Matrix(temp->height, temp->width);
+	temp2->mat = Flipud(temp->mat, temp->height, temp->width);		//flipud(yT(1:rr, : ))
 	delete temp; delete extentedMatrix;
 
-	return yT;
+	extentedMatrix = MatrixRowExtend(temp2->mat, temp2->height, temp2->width, yT->mat, yT->height, yT->width);
+	delete temp2;
+	
+	temp = MatrixCut(yT->mat, yT->height, yT->width, m - 1, m - q - s2 + 1 - 1, 0, yT->width - 1, -1, 1);	//yT(m  :-1 : m - q - s2 + 1, : )
+	
+	delete yT;
+	yT = MatrixRowExtend(extentedMatrix->mat, extentedMatrix->height, extentedMatrix->width, temp->mat, temp->height, temp->width);
+	delete extentedMatrix; delete temp;
+
+	// yT(1:m+p-1 ,1:n+q-1) 
+	Matrix* retyT = MatrixCut(yT->mat, yT->height, yT->width, 0, m + p - 1 - 1, 0, n + q - 1 - 1);
+	delete yT;
+
+	return retyT;
 }
 
 
@@ -579,31 +599,55 @@ Cont* AtrousFilters(const char* fname) {
 			h1 = [h1; flipud(h1(1:end - 1, : ))];
 		*/
 
+		float* lr, *ud;
 		// g0
 		Matrix* cutG0 = MatrixCut(g0, g0Height, g0Width, 0, g0Height - 1, 0, g0Width - 2);
-		Matrix* extG0 = MatrixColExtend(g0, g0Height, g0Width, Fliplr(cutG0->mat, cutG0->height, cutG0->width), cutG0->height, cutG0->width);
+		lr = Fliplr(cutG0->mat, cutG0->height, cutG0->width);
+		Matrix* extG0 = MatrixColExtend(g0, g0Height, g0Width, lr, cutG0->height, cutG0->width);
+		delete[] lr;
+
 		// g0
 		Matrix* cutExtG0 = MatrixCut(extG0->mat, extG0->height, extG0->width, 0, extG0->height - 2, 0, extG0->width - 1);
-		Matrix* retG0 = MatrixRowExtend(extG0->mat, extG0->height, extG0->width, Flipud(cutExtG0->mat, cutExtG0->height, cutExtG0->width), cutExtG0->height, cutExtG0->width);
+		ud = Flipud(cutExtG0->mat, cutExtG0->height, cutExtG0->width);
+		Matrix* retG0 = MatrixRowExtend(extG0->mat, extG0->height, extG0->width, ud , cutExtG0->height, cutExtG0->width);
+		delete[] ud;
+
 		// h0
 		Matrix* cutH0 = MatrixCut(h0, h0Height, h0Width, 0, h0Height - 1, 0, h0Width - 2);
-		Matrix* extH0 = MatrixColExtend(h0, h0Height, h0Width, Fliplr(cutH0->mat, cutH0->height, cutH0->width), cutH0->height, cutH0->width);
+		lr = Fliplr(cutH0->mat, cutH0->height, cutH0->width);
+		Matrix* extH0 = MatrixColExtend(h0, h0Height, h0Width, lr, cutH0->height, cutH0->width);
+		delete[] lr; 
+
 		// h0
 		Matrix* cutExtH0 = MatrixCut(extH0->mat, extH0->height, extH0->width, 0, extH0->height - 2, 0, extH0->width - 1);
-		Matrix* retH0 = MatrixRowExtend(extH0->mat, extH0->height, extH0->width, Flipud(cutExtH0->mat, cutExtH0->height, cutExtH0->width), cutExtH0->height, cutExtH0->width);
+		ud = Flipud(cutExtH0->mat, cutExtH0->height, cutExtH0->width);
+		Matrix* retH0 = MatrixRowExtend(extH0->mat, extH0->height, extH0->width, ud , cutExtH0->height, cutExtH0->width);
+		delete[] ud;
 
 		// g1
 		Matrix* cutG1 = MatrixCut(g1, g1Height, g1Width, 0, g1Height - 1, 0, g1Width - 2);
-		Matrix* extG1 = MatrixColExtend(g1, g1Height, g1Width, Fliplr(cutG1->mat, cutG1->height, cutG1->width), cutG1->height, cutG1->width);
+		lr = Fliplr(cutG1->mat, cutG1->height, cutG1->width);
+		Matrix* extG1 = MatrixColExtend(g1, g1Height, g1Width, lr, cutG1->height, cutG1->width);
+		delete[] lr;
+
 		// g1
 		Matrix* cutExtG1 = MatrixCut(extG1->mat, extG1->height, extG1->width, 0, extG1->height - 2, 0, extG1->width - 1);
-		Matrix* retG1 = MatrixRowExtend(extG1->mat, extG1->height, extG1->width, Flipud(cutExtG1->mat, cutExtG1->height, cutExtG1->width), cutExtG1->height, cutExtG1->width);
+		ud = Flipud(cutExtG1->mat, cutExtG1->height, cutExtG1->width);
+		Matrix* retG1 = MatrixRowExtend(extG1->mat, extG1->height, extG1->width, ud , cutExtG1->height, cutExtG1->width);
+		delete[] ud;
+
 		// h1
 		Matrix* cutH1 = MatrixCut(h1, h1Height, h1Width, 0, h1Height - 1, 0, h1Width - 2);
-		Matrix* extH1 = MatrixColExtend(h1, h1Height, h1Width, Fliplr(cutH1->mat, cutH1->height, cutH1->width), cutH1->height, cutH1->width);
+		lr = Fliplr(cutH1->mat, cutH1->height, cutH1->width);
+		Matrix* extH1 = MatrixColExtend(h1, h1Height, h1Width, lr, cutH1->height, cutH1->width);
+		delete[] lr;
+
 		// h1
 		Matrix* cutExtH1 = MatrixCut(extH1->mat, extH1->height, extH1->width, 0, extH1->height - 2, 0, extH1->width - 1);
-		Matrix* retH1 = MatrixRowExtend(extH1->mat, extH1->height, extH1->width, Flipud(cutExtH1->mat, cutExtH1->height, cutExtH1->width), cutExtH1->height, cutExtH1->width);
+		ud = Flipud(cutExtH1->mat, cutExtH1->height, cutExtH1->width);
+		Matrix* retH1 = MatrixRowExtend(extH1->mat, extH1->height, extH1->width, ud , cutExtH1->height, cutExtH1->width);
+		delete[] ud;
+
 
 		Cont* ret = new Cont(4);
 		ret->mats[0] = retG0;
@@ -619,6 +663,7 @@ Cont* AtrousFilters(const char* fname) {
 		return ret;
 	}
 
+	else exit(1);
 }
 
 
@@ -639,21 +684,22 @@ Cont* AtrousFilters(const char* fname) {
 ///		<para></para>
 ///		y->[1..4] => HFC (High frequency coefficients)
 /// </returns>
-Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
+Cont* AtrousDec(Matrix* image, Cont* filters, int level)
 {
-	Cont* filters = AtrousFilters(lpfilt);
-
-	// New filter coefficients are obtained	-- Only once -- Optional
-	/*filters->mats[1] = Conv2(filters->mats[1], filters->mats[0], "same");
-	filters->mats[3] = Conv2(filters->mats[3], filters->mats[2], "same");*/
+	Matrix* y0, *y1,* sym, * upSample;
 
 	float* shift = new float[2]{ 1.0F, 1.0F };
 
 	// NSLP - Non Subsampled Laplacian Pyramid
 	// Orijinal goruntuye alcak ve yuksek katsayilarin uygulanmasi 
 	// symext kullanilarak katsayilara gore genisletilir, ardindan conv2 ile kucultulurek ayni boyuta getirilir.
-	Matrix* y0 = Conv2(symext(image, filters->mats[1], shift), filters->mats[1], "valid");	// Alcak
-	Matrix* y1 = Conv2(symext(image, filters->mats[3], shift), filters->mats[3], "valid");	// Yuksek
+	sym = symext(image, filters->mats[1], shift);
+	y0 = Conv2(sym, filters->mats[1], "valid");	// Alcak
+	delete sym;
+
+	sym = symext(image, filters->mats[3], shift);
+	y1 = Conv2(sym, filters->mats[3], "valid");	// Yuksek
+	delete sym;
 
 	Cont* y = new Cont(level + 1);
 	y->mats[level] = y1;
@@ -662,24 +708,33 @@ Cont* AtrousDec(Matrix* image, const char* lpfilt, int level)
 	float* I2 = Eye(2), * I2L;
 	int L;
 
-	// Seviye 1'e inene kadar her alcak frekans katsayilarinin alcak ve yuksek katsayisi hesaplanir.
-	// Yuksek Frekans Katsayilari y[4..1] olarak tutulur.
+	// Seviye 1'e inene kadar her alcak frekans katsayilarinin alcak ve yuksek katsayyisi hesaplanir.
+	// Yuksek frekansa katsayilari y[4..1] olarak tutulur.
 	for (int i = 1; i <= level - 1; i++)
 	{
 		shift[0] = (-1.0F * (float)pow(2, i - 1)) + 2.0F;
 		shift[1] = (-1.0F * (float)pow(2, i - 1)) + 2.0F;
 		L = (int)pow(2, i);
 		I2L = ScalarMatMul(I2, 2 * 2, L);
+		
+		upSample = Upsample2df(filters->mats[1], i);
+		sym = symext(image, upSample, shift);
+		y0 = Atrousc(sym, filters->mats[1], I2L);
+		delete upSample;
+		delete sym;
 
-		y0 = Atrousc(symext(image, Upsample2df(filters->mats[1], i), shift), filters->mats[1], I2L);
-		y1 = Atrousc(symext(image, Upsample2df(filters->mats[3], i), shift), filters->mats[3], I2L);
+		upSample = Upsample2df(filters->mats[3], i);
+		sym = symext(image, upSample, shift);
+		y1 = Atrousc(sym, filters->mats[3], I2L);
+		delete upSample;
+		delete sym;
 
 		y->mats[level - i] = y1;
 		image = y0;
 
-		delete[] I2L;
+		delete[] I2L; 
 	}
-	y->mats[0] = image;		// AFK setted
+	y->mats[0] = image;		// Alcak frekans katsayisi atanir.
 
 	delete[] I2;
 	delete[] shift;
@@ -722,6 +777,7 @@ Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 	float* shift = new float[2]{ 1.0, 1.0 };
 	float L = 0.0;
 
+	Matrix* up, * sym, * mult, * atrousc1, * atrousc2;
 	for (int i = NLevels - 1; i >= 1; i--) {
 
 		y1 = y->mats[NLevels - i];			// Matlab: y{2} <=> C: y[1]
@@ -734,19 +790,20 @@ Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 
 		// x = atrousc(symext(x, upsample2df(g0, i), shift), g0, L * I2) + atrousc(symext(y1, upsample2df(g1, i), shift), g1, L * I2);
 
-		Matrix* mult = *I2 * L;
+		mult = *I2 * L;
 
-		Matrix* up1 = Upsample2df(g0, i);
-		Matrix* symext1 = symext(x, up1, shift);
-		Matrix* atrousc1 = Atrousc(symext1, g0, mult->mat);
+		up = Upsample2df(g0, i);
+		sym = symext(x, up, shift);		delete up;
+		atrousc1 = Atrousc(sym, g0, mult->mat);	delete sym;
 
-		Matrix* up2 = Upsample2df(g1, i);
-		Matrix* symext2 = symext(y1, up2, shift);
-		Matrix* atrousc2 = Atrousc(symext2, g1, mult->mat);
+		up = Upsample2df(g1, i);
+		sym = symext(y1, up, shift);	delete up;
+		atrousc2 = Atrousc(sym, g1, mult->mat);	delete sym;
 
 		x = *atrousc1 + *atrousc2;
 
-		delete up1; delete up2; delete symext1; delete symext2; delete mult; delete atrousc1; delete atrousc2;
+
+		 delete mult; delete atrousc1; delete atrousc2;
 	}
 
 	shift[0] = 1.0;
@@ -759,7 +816,7 @@ Matrix* AtrousRec(Cont* y, const char* lpfilt) {
 	Matrix* conv2Y = Conv2(symetxY, g1, "valid");
 	x = *conv2X + *conv2Y;
 
-	delete I2; delete y1; delete g0; delete h0; delete g1; delete h1; delete symetxX; delete symetxY; delete conv2X; delete conv2Y;
+	delete I2; delete g0; delete h0; delete g1; delete h1; delete symetxX; delete symetxY; delete conv2X; delete conv2Y;
 
 	return x;
 }

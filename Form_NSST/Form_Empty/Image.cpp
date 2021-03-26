@@ -64,7 +64,7 @@ BYTE* LoadBMP(int% width, int% height, long% size, LPCTSTR bmpfile)
 
 	return Buffer;
 }//LoadBMP
-float* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
+BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 {
 	// first make sure the parameters are valid
 	if ((NULL == Buffer) || (width == 0) || (height == 0))
@@ -80,7 +80,7 @@ float* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 	int psw = scanlinebytes + padding;
 
 	// create new buffer
-	float* newbuf = new float[width * height];
+	BYTE* newbuf = new BYTE[width * height];
 
 	// now we loop trough all bytes of the original buffer, 
 	// swap the R and B bytes and the scanlines
@@ -96,7 +96,7 @@ float* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 				Buffer[bufpos + 2] => Red
 			*/
 
-			newbuf[newpos] = (float)(int)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
+			newbuf[newpos] = (BYTE)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
 		}
 
 	return newbuf;

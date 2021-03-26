@@ -14,10 +14,9 @@
 /// 	directions.The length of the vector plus 1 is
 /// 	total the number of decompostions.
 /// </param>
-/// <param name="lpfilt : ">
-///		lpfilt is the filter to be used for the Laplacian Pyramid / ATrous decomposition using the codes
+/// <param name="filters : ">
+///		
 /// </param>
-/// <returns>
-///		the cell array containing the discrete shearlet tranform coefficients
-/// </returns>
-Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, const char* lpfilt);
+/// <param name="shearFilterMyer : "></param>
+/// <returns></returns>
+Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, Cont* filters, Matrix** shearFilterMyer);
