@@ -196,20 +196,46 @@ namespace Form_Empty {
 		}
 #pragma endregion
 	private: System::Void openToolStripMenuItem1_Click(System::Object^ sender, System::EventArgs^ e) {
+		
+		long size;
+		BYTE* buffer;
+		int width, height;
+		const char* lpfilt = "maxflat";
+
+		ShearParameters shearParameters;
+		shearParameters.dcompSize = 4;				// K => numbers of YFK
+		shearParameters.dcomp = new int[4]{ 3, 3, 4, 4 };
+		shearParameters.dsize = new int[4]{ 32, 32, 16, 16 };
+
+		int selectedImages = openFileDialog1->FileNames->GetLength(0);
+
+		int imageSize;
+		float* maxX;
+		float* maxY;
+		float* IXYBuffer;
+
+		Matrix* image;
+		Cont* dst = new Cont;
+		Cont* coefficients;
+		int* depths = new int[5]{ 1, 8, 8, 16, 16 };
+
+
+		// Low and High Frequences Coefficients -- 2D Laplacian Pyramid filters
+		Cont* filters = AtrousFilters(lpfilt);
+
+		// New filter coefficients are obtained	-- Only once -- Optional
+		filters->mats[1] = Conv2(filters->mats[1], filters->mats[0], "same");
+		filters->mats[3] = Conv2(filters->mats[3], filters->mats[2], "same");
+
+
+		Matrix** shearFilterMyer = new Matrix * [shearParameters.dcompSize];
+		for (int i = 0; i < shearParameters.dcompSize; i++)
+			shearFilterMyer[i] = ShearingFiltersMyer(shearParameters.dsize[i], shearParameters.dcomp[i]);
+
 
 		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
-			long size;
-			BYTE* buffer;
-			int width, height;
-			const char* lpfilt = "maxflat";
-
-			ShearParameters shearParameters;
-			shearParameters.dcompSize = 4;						// K => numbers of YFK
-			shearParameters.dcomp = new int[4]{3, 3, 4, 4};
-			shearParameters.dsize = new int[4]{32, 32, 16, 16};
-
-
+			
 			/*width = 320;
 			height = 240;
 			CString path = openFileDialog1->FileName;
@@ -238,7 +264,8 @@ namespace Form_Empty {
 
 
 			// NSST - Non Subsampled Shearlet Transform
-			Cont* dst = NsstDec1e(image, shearParameters, lpfilt);
+			Cont* dst = NsstDec1e(image, shearParameters, filters, shearFilterMyer);
+			//Cont* dst = NsstDec1e(image, shearParameters, lpfilt);
 			/*	INFO
 				dst->mats[cellIndex][deepIndex]
 				dst->mats[0][0]			=> AFK is 1 piece and deep	 => 1

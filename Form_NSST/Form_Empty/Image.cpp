@@ -64,7 +64,7 @@ BYTE* LoadBMP(int% width, int% height, long% size, LPCTSTR bmpfile)
 
 	return Buffer;
 }//LoadBMP
-BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
+float* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 {
 	// first make sure the parameters are valid
 	if ((NULL == Buffer) || (width == 0) || (height == 0))
@@ -80,7 +80,7 @@ BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 	int psw = scanlinebytes + padding;
 
 	// create new buffer
-	BYTE* newbuf = new BYTE[width * height];
+	float* newbuf = new float[width * height];
 
 	// now we loop trough all bytes of the original buffer, 
 	// swap the R and B bytes and the scanlines
@@ -96,7 +96,7 @@ BYTE* ConvertBMPToIntensity(BYTE* Buffer, int width, int height)
 				Buffer[bufpos + 2] => Red
 			*/
 
-			newbuf[newpos] = (BYTE)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
+			newbuf[newpos] = (float)(int)(0.11 * Buffer[bufpos + 2] + 0.59 * Buffer[bufpos + 1] + 0.3 * Buffer[bufpos]);
 		}
 
 	return newbuf;
@@ -143,7 +143,7 @@ float* ConvertBMPToYCbCr(BYTE* Buffer, int width, int height)
 			red = Buffer[bufpos + 2];
 
 			//// ITU-R BT.601 conversion between[16..240]
-			newbuf[newpos] = (float)(16 + 0.257 * red + 0.504 * green +  0.098 * blue);						// Y  => Intensity
+			newbuf[newpos] = (float)(16 + 0.257 * red + 0.504 * green + 0.098 * blue);						// Y  => Intensity
 			newbuf[newpos + imgsize] = (float)(128 - 0.148 * red - 0.291 * green + 0.439 * blue);			// Cb => X
 			newbuf[newpos + imgsize * 2] = (float)(128 + 0.439 * red - 0.368 * green - 0.071 * blue);		// Cr => Y
 
@@ -152,7 +152,7 @@ float* ConvertBMPToYCbCr(BYTE* Buffer, int width, int height)
 			//newbuf[newpos + imgsize] = (float)(128 - 0.168736 * red - 0.331264 * green + 0.5 * blue);		// Cb => X
 			//newbuf[newpos + imgsize * 2] = (float)(128 + 0.5 * red - 0.418688 * green - 0.081312 * blue);	// Cr => Y
 		}
-	
+
 	return newbuf;
 }
 
