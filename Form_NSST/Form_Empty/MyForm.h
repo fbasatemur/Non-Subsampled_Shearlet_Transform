@@ -224,8 +224,8 @@ namespace Form_Empty {
 		Cont* filters = AtrousFilters(lpfilt);
 
 		// New filter coefficients are obtained	-- Only once -- Optional
-		filters->mats[1] = Conv2(filters->mats[1], filters->mats[0], "same");
-		filters->mats[3] = Conv2(filters->mats[3], filters->mats[2], "same");
+		//filters->mats[1] = Conv2(filters->mats[1], filters->mats[0], "same");
+		//filters->mats[3] = Conv2(filters->mats[3], filters->mats[2], "same");
 
 
 		Matrix** shearFilterMyer = new Matrix * [shearParameters.dcompSize];
