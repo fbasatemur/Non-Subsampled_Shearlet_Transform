@@ -1,11 +1,7 @@
 # Non-Subsampled_Shearlet_Transform
 
-<<<<<<< HEAD
 ## What is NSST ?
 NSST is a discrete form of Shearlet transform, and it differs from other multi-scale transformations by avoiding up-down samplers. NSST consists of two main stages, multi-scale and multi-directional separations.
-=======
-:white_check_mark: NSST is ready for use. Necessary explanations will be made soon...
->>>>>>> develop
 
 ### Multi-scale
 <ul>
