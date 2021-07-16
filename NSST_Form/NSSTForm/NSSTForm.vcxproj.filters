@@ -19,7 +19,7 @@
     <ClCompile Include="MatlabFuncs.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="MyForm.cpp">
+    <ClCompile Include="NSSTForm.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="NSSTFuncs.cpp">
@@ -27,7 +27,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="MyForm.h" />
+    <ClInclude Include="NSSTForm.h" />
     <ClInclude Include="FFT.h">
       <Filter>Header</Filter>
     </ClInclude>

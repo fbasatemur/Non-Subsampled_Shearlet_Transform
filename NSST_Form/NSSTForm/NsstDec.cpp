@@ -29,6 +29,7 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, Cont* filters,
 	
 	//Laplacian Pyramid decomposition	//NSLP //cok olceklilik
 	//Katsayilara gore alt-goruntuler elde edilir.
+
 	Cont* y = AtrousDec(image, filters, level);
 
 	Cont* dst = new Cont(level + 1);
@@ -51,9 +52,9 @@ Cont* NsstDec1e(Matrix* image, const ShearParameters& shearParam, Cont* filters,
 		dst->mats[i + 1]->depth = size;
 	}
 
-	delete shearF;
 
-	int depth;
+	delete shearF;
+	size_t depth;
 	for (size_t cell = 1; cell < 5; cell++) {
 
 		depth = y->mats[cell]->depth;

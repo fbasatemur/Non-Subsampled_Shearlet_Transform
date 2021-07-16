@@ -70,7 +70,7 @@ Matrix* RecFromPol(Matrix* l, int n, Matrix* gen);
 /// <returns>
 ///		yT image symetrically extended(H / V symmetry)
 /// </returns>
-Matrix* symext(Matrix* x, Matrix* h, float* shift);
+Matrix* Symext(Matrix* x, const Matrix* h, float* shift);
 
 // upsample filter by 2^power
 Matrix* Upsample2df(const Matrix* mat, int power);
@@ -93,7 +93,7 @@ Matrix* Upsample2df(const Matrix* mat, int power);
 ///		2D result of convolution with filter upsampled by a m, only the 'valid' part is returned. <para></para>
 ///		Similar to conv2(x, h, 'valid'), where h is the upsampled filter.
 /// </returns>
-Matrix* Atrousc(Matrix* signal, Matrix* filter, float* upMatrix);
+Matrix* Atrousc(Matrix* signal, const Matrix* filter, float* upMatrix);
 
 /// <summary>
 ///		ATROUSDEC - computes the 2 - D atrous decomposition using symmetric extension.
@@ -137,7 +137,7 @@ Cont* AtrousFilters(const char* fname);
 /// <returns>
 ///		x : reconstructed image
 /// </returns>
-Matrix* AtrousRec(Cont* y, const char* lpfilt);
+Matrix* AtrousRec(Cont* y, const Cont* filters);
 
 /// <summary>
 ///		This function generates the matrix that contains the number of times the polar grid points go through the rectangular grid 

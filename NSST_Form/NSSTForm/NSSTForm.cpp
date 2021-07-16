@@ -1,4 +1,4 @@
-#include "MyForm.h"
+#include "NSSTForm.h"
 
 using namespace System;
 using namespace System::Windows::Forms;
@@ -8,6 +8,6 @@ void Main(array<String^>^args)
 {
 	Application::EnableVisualStyles();
 	Application::SetCompatibleTextRenderingDefault(false);
-	Form_Empty::MyForm form;
+	NSSTForm::NSSTForm form;
 	Application::Run(%form);
 }

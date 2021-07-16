@@ -13,7 +13,7 @@
 #include "NSSTFuncs.h"
 
 
-namespace Form_Empty {
+namespace NSSTForm {
 
 	using namespace System;
 	using namespace System::ComponentModel;
@@ -25,10 +25,10 @@ namespace Form_Empty {
 	/// <summary>
 	/// Summary for MyForm
 	/// </summary>
-	public ref class MyForm : public System::Windows::Forms::Form
+	public ref class NSSTForm : public System::Windows::Forms::Form
 	{
 	public:
-		MyForm(void)
+		NSSTForm(void)
 		{
 			InitializeComponent();
 			//
@@ -40,7 +40,7 @@ namespace Form_Empty {
 		/// <summary>
 		/// Clean up any resources being used.
 		/// </summary>
-		~MyForm()
+		~NSSTForm()
 		{
 			if (components)
 			{
@@ -114,7 +114,7 @@ namespace Form_Empty {
 			this->openToolStripMenuItem1->Name = L"openToolStripMenuItem1";
 			this->openToolStripMenuItem1->Size = System::Drawing::Size(128, 26);
 			this->openToolStripMenuItem1->Text = L"Open";
-			this->openToolStripMenuItem1->Click += gcnew System::EventHandler(this, &MyForm::openToolStripMenuItem1_Click);
+			this->openToolStripMenuItem1->Click += gcnew System::EventHandler(this, &NSSTForm::openToolStripMenuItem1_Click);
 			// 
 			// pictureBox1
 			// 
@@ -184,7 +184,7 @@ namespace Form_Empty {
 			this->Controls->Add(this->menuStrip1);
 			this->MainMenuStrip = this->menuStrip1;
 			this->Margin = System::Windows::Forms::Padding(4);
-			this->Name = L"MyForm";
+			this->Name = L"NSSTForm";
 			this->Text = L"NSST Form";
 			this->menuStrip1->ResumeLayout(false);
 			this->menuStrip1->PerformLayout();
@@ -236,23 +236,6 @@ namespace Form_Empty {
 		if (openFileDialog1->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 		{
 			
-			/*width = 320;
-			height = 240;
-			CString path = openFileDialog1->FileName;
-			std::ifstream file(path);
-			Matrix* image = new Matrix;
-			image->CreateMatrix(height, width, 1);
-
-			if (file.is_open()) {
-				float temp;
-				for (int i = 0; i < height * width; i++) {
-					file >> temp;
-					image->mat[i] = temp;
-				}
-			}
-			file.close();*/
-
-			
 			CString path = openFileDialog1->FileName; 
 			// LoadBMP can read only 24 bit image depth
 			buffer = LoadBMP(width, height, size, (LPCTSTR)path);
@@ -273,7 +256,7 @@ namespace Form_Empty {
 			*/
 					
 			// Inverse NSST
-			Matrix* inverseNSST = NsstRec1(dst, lpfilt);
+			Matrix* inverseNSST = NsstRec1(dst, filters);
 
 
 			// display Inverse NSST result
@@ -300,6 +283,14 @@ namespace Form_Empty {
 			delete inverseNSST;
 			delete[] intensity;
 			delete[] buffer;
+			delete[] depths;
+
+			for (int i = 0; i < filters->matNums; i++)
+				delete filters->mats[i];
+
+			for (int i = 0; i < shearParameters.dcompSize; i++)
+				delete[] shearFilterMyer[i];
+			delete[] shearFilterMyer;
 		}
 	}
 	};
