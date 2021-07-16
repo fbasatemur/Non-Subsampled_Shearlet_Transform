@@ -13,4 +13,4 @@
 /// <returns>
 ///		the reconstructed image
 /// </returns>
-Matrix* NsstRec1(Cont* dst, const char* lpfilt);
+Matrix* NsstRec1(Cont* dst, const Cont* filters);

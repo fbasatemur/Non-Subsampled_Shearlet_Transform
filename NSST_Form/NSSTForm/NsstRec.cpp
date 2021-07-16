@@ -14,16 +14,24 @@
 /// <returns>
 ///		the reconstructed image
 /// </returns>
-Matrix* NsstRec1(Cont* dst, const char* lpfilt) {
+Matrix* NsstRec1(Cont* dst, const Cont* filters) {
 
 	int level = dst->matNums - 1;
-	
 	Cont* y = new Cont(level + 1);
 	y->mats[0] = dst->mats[0];
 
-	for (int i = 1; i <= level; i++)		
+
+	for (int i = 1; i <= level; i++)
 		y->mats[i] = Sum(dst->mats[i], 3);
-	
-	
-	return AtrousRec(y, lpfilt);
+
+	Matrix* ret = AtrousRec(y, filters);
+
+	int depth;
+	for (size_t cell = 1; cell < 5; cell++) {
+
+		depth = y->mats[cell]->depth;
+		for (size_t d = 0; d < depth; d++)
+			delete[] y->mats[cell][d].mat;
+	}
+	return ret;
 }

@@ -143,7 +143,7 @@ float* ConvertBMPToYCbCr(BYTE* Buffer, int width, int height)
 			red = Buffer[bufpos + 2];
 
 			//// ITU-R BT.601 conversion between[16..240]
-			newbuf[newpos] = (float)(16 + 0.257 * red + 0.504 * green +  0.098 * blue);						// Y  => Intensity
+			newbuf[newpos] = (float)(16 + 0.257 * red + 0.504 * green + 0.098 * blue);						// Y  => Intensity
 			newbuf[newpos + imgsize] = (float)(128 - 0.148 * red - 0.291 * green + 0.439 * blue);			// Cb => X
 			newbuf[newpos + imgsize * 2] = (float)(128 + 0.439 * red - 0.368 * green - 0.071 * blue);		// Cr => Y
 
@@ -152,7 +152,7 @@ float* ConvertBMPToYCbCr(BYTE* Buffer, int width, int height)
 			//newbuf[newpos + imgsize] = (float)(128 - 0.168736 * red - 0.331264 * green + 0.5 * blue);		// Cb => X
 			//newbuf[newpos + imgsize * 2] = (float)(128 + 0.5 * red - 0.418688 * green - 0.081312 * blue);	// Cr => Y
 		}
-	
+
 	return newbuf;
 }
 
