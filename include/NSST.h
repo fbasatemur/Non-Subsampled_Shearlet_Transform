@@ -41,13 +41,9 @@ public:
 
     /// <summary>
     ///		ATROUSFILTERS	Generate pyramid 2D filters
-    /// </summary>
-    /// <param name="fname : ">
     ///		'maxflat':		Filters derived from 1-D using maximally flat mapping function with 4 vanishing moments
-    /// </param>
-    /// <returns>
     ///		h0, h1, g0, g1:	pyramid filters for 2-D nonsubsampled filter bank (lowpass and highpass)
-    /// </returns>
+    /// </summary>
     void AtrousFilters();
 
     /// <summary>
@@ -80,14 +76,15 @@ public:
     Tensor &RecFromPol(const ArrayXXf &l, int n, const Tensor* gen);
 
     /// <summary>
-    ///		This function computes the(local) nonsubsampled shearlet transform as given
+    ///		This function computes the(local) nonsubsampled shearlet transform as given.
     /// </summary>
     /// <param name="input">
     ///		input input
     /// </param>
-    /// <param name="shearFilterMyer"></param>
-    /// <returns></returns>
-    Cont *NsstDec1e(Tensor *input);
+    /// <returns>
+    ///		decomposition of input
+    /// </returns>
+    Cont *Dec(Tensor *input);
 
     /// <summary>
     ///		ATROUSDEC - computes the 2 - D atrous decomposition using symmetric extension.
@@ -156,7 +153,7 @@ public:
     /// <returns>
     ///		the reconstructed input
     /// </returns>
-    Tensor *NsstRec1(const Cont * __restrict dst);
+    Tensor *Rec(const Cont * __restrict dst);
 
     /// <summary>
     ///		SATROUSREC - computes the inverse of 2 - D atrous decomposition computed with ATROUSDEC

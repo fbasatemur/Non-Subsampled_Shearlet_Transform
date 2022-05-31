@@ -11,14 +11,14 @@ namespace Conf{
 
     struct ShearParameters
     {
-        static constexpr int dcompSize = 4;        // K => numbers of YFK
+        static constexpr const int dcompSize = 4;        // K => numbers of YFK
         std::array<int, dcompSize> dcomp;
         std::array<int, dcompSize> dsize;
     };
 
-    static char const* image_path = "../images/barbara.bmp";
-    static char const* save_image_path = "../images/regenerated.bmp";
-    static char const* lpfilt = "maxflat";
+    static const char* image_path = "../images/barbara.bmp";
+    static const char* save_image_path = "../images/regenerated.bmp";
+    static constexpr const char* lpfilt = "maxflat";
 
     // Shearlet coefficients
     static ShearParameters sp = {.dcomp = {3, 3, 4, 4 },

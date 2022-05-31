@@ -5,7 +5,12 @@
 #ifndef NSST_FFTWF_H
 #define NSST_FFTWF_H
 
+#if __unix__
+#include "fftw-3.3.5/fftw3.h"
+#else
 #include "fftw-3.3.5-dll64/fftw3.h"
+#endif
+
 #define REAL 0
 #define IMAG 1
 

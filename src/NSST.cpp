@@ -2,17 +2,13 @@
 #include <memory>
 #include "NSST.h"
 #include "fftwf_wrapper.h"
-#include "circ_shift.h"
+#include "Circ_Shift.h"
 
 /// <summary>
 ///		ATROUSFILTERS	Generate pyramid 2D filters
-/// </summary>
-/// <param name="fname : ">
 ///		'maxflat':		Filters derived from 1-D using maximally flat mapping function with 4 vanishing moments
-/// </param>
-/// <returns>		 
-///		h0, h1, g0, g1:	pyramid filters for 2-D nonsubsampled filter bank (lowpass and highpass)
-/// </returns>
+///		calculate h0, h1, g0, g1:	pyramid filters for 2-D nonsubsampled filter bank (lowpass and highpass)
+/// </summary>
 void NSST::AtrousFilters() {
 
     constexpr int h0Width = 7, h0Height = 7;
@@ -150,26 +146,25 @@ void NSST::AtrousFilters() {
 /// </returns>
 Tensor *NSST::AvgPol(int L, const ArrayXXf &x1, const ArrayXXf &y1, const ArrayXXf &x2, const ArrayXXf &y2) {
     Tensor *d = new Tensor;
-    d->Set(L, L);
-    d->_mat = Eigen::MatrixXf::Zero(L, L);
+    d->Set(L, L).Create::Zero();
 
-    for (int i = 0; i < L; i++)
-        for (int j = 0; j < L; j++) {
-            d->_mat(static_cast<int>((y1(i,j) - 1)), static_cast<int>((x1(i,j) - 1)))++;
-            d->_mat(static_cast<int>((y2(i,j) - 1)), static_cast<int>((x2(i,j) - 1)))++;
+    for (int i = 0; i < L; ++i)
+        for (int j = 0; j < L; ++j) {
+            d->_mat(static_cast<int>((y1(i, j) - 1)), static_cast<int>((x1(i, j) - 1)))++;
+            d->_mat(static_cast<int>((y2(i, j) - 1)), static_cast<int>((x2(i, j) - 1)))++;
         }
 
     return d;
 }
 
 /// <summary>
-///		This function generates the xand y vectors that contain the i, j coordinates to extract radial slices
+///		This function generates the x and y vectors that contain the i, j coordinates to extract radial slices
 /// </summary>
 /// <param name="n : ">
 ///		n is the order of the block to be used
 /// </param>
 /// <returns>
-///		** return [x1n, y1n, x2n, y2n, D] ** <para></para>
+///		** return [x1n, y1n, x2n, y2n, D] **
 ///		x1, y1 are the i, j values that correspond to the radial slices from the endpoints 1, 1 to n, 1 through the origin <para></para>
 ///		x2, y2 are the i, j values that correspond to the radial slices from the endpoints 1, 1 to 1, n through the origin <para></para>
 ///		D is the matrix that contains the number of times the polar grid points go through the rectangular grid
@@ -187,7 +182,7 @@ Tensor *NSST::GenXYCoordinates(int n) {
     constexpr int y0 = 1;
     int flag = 0, x0 = 0, xN = 0, yN = n;
 
-    for (int i = 0; i < n; i++) {
+    for (int i = 0; i < n; ++i) {
         x0 = i + 1;
         xN = n - x0 + 1;
 
@@ -199,17 +194,13 @@ Tensor *NSST::GenXYCoordinates(int n) {
 
         xt = Linspace(x0, xN, n);
 
-        for (int j = 0; j < n; j++) {
+        for (int j = 0; j < n; ++j) {
             if (flag == 0) {
-                y1(i, j) = roundf(m.get()[i] * static_cast<float>(xt[j] - x0) + y0);
-                x1(i, j) = roundf(xt[j]);
-                x2(i, j) = y1(i, j);
-                y2(i, j) = x1(i, j);
+                x1(i, j) = y2(i, j) = roundf(xt[j]);
+                x2(i, j) = y1(i, j) = roundf(m.get()[i] * static_cast<float>(xt[j] - x0) + y0);
             } else {
-                x1(i, j) = static_cast<int>((n - 1) / 2) + 1;
-                y2(i, j) = static_cast<int>((n - 1) / 2) + 1;
-                y1(i, j) = j + 1;
-                x2(i, j) = j + 1;
+                x1(i, j) = y2(i, j) = static_cast<int>((n - 1) / 2) + 1;
+                x2(i, j) = y1(i, j) = j + 1;
             }
         }
 
@@ -254,16 +245,18 @@ Tensor *NSST::GenXYCoordinates(int n) {
 inline float MeyerWind(const float &x) {
 
     float y = 0.0F;
+    constexpr float x_less = -1.0F / 3.0F + 1.0F / 2.0F, x_greater = 1.0F / 3.0F + 1.0F / 2.0F;
+    constexpr float x_less_equal1 = 1.0F / 3.0F + 1.0F / 2.0F, x_greater_equal1 = 2.0F / 3.0F + 1.0F / 2.0F;
+    constexpr float x_less_equal2 = -2.0F / 3.0F + 1.0F / 2.0F, x_greater_equal2 = 1.0F / 3.0F + 1.0F / 2.0F;
 
-    if ((-1.0F / 3.0F + 1.0F / 2.0F < x) && (x < 1.0F / 3.0F + 1.0F / 2.0F))
+    if (x_less < x && x < x_greater)
         y = 1.0F;
 
-    else if (((1.0F / 3.0F + 1.0F / 2.0F <= x) && (x <= 2.0F / 3.0F + 1.0F / 2.0F)) ||
-             ((-2.0F / 3.0F + 1.0F / 2.0F <= x) && (x <= 1.0F / 3.0F + 1.0F / 2.0F))) {
+    else if ((x_less_equal1 <= x && x <= x_greater_equal1) || (x_less_equal2 <= x && x <= x_greater_equal2)) {
 
         float w = 3.0F * abs(x - 1.0F / 2.0F) - 1.0F;
-        float z = powf(w, 4.0F) * (35 - 84 * w + 70 * powf(w, 2) - 20 * powf(w, 3));
-        y = powf(cos(PI / 2.0F * (z)), 2);
+        float z = powf(w, 4.0F) * (35.0F - 84.0F * w + 70.0F * powf(w, 2.0F) - 20.0F * powf(w, 3.0F));
+        y = powf(cosf(PI / 2.0F * (z)), 2.0F);
     }
 
     return y;
@@ -275,7 +268,9 @@ inline float MeyerWind(const float &x) {
 /// <param name="x : ">
 ///		x - signal to be decomposed
 /// </param>
-/// <param name="lenghtX : "></param>
+/// <param name="N : ">
+///     N - len(x)
+/// </param>
 /// <param name="L : ">
 ///		L - number of bandpass filters
 /// </param>
@@ -291,15 +286,15 @@ Tensor *NSST::Windowing(const float *x, int N, int L) {
     std::unique_ptr<float> g(ZERO(2 * T));
 
     float n = 0;
-    for (int j = 0; j < 2 * T; j++) {
-        n = -1 * T / 2 + j;
+    for (int j = 0; j < 2 * T; ++j) {
+        n = -1.0F * T / 2.0F + j;
         g.get()[j] = MeyerWind(n / T);
     }
 
     int index = 0, in_sig = 0;
-    for (int j = 0; j < L; j++) {
+    for (int j = 0; j < L; ++j) {
         index = 0;
-        for (int k = -1 * T / 2; k <= 1.5 * T - 1; k++) {
+        for (int k = -1 * T / 2; k <= 1.5 * T - 1; ++k) {
             in_sig = floor(Realmod(static_cast<int>(k + j * T), N));
             y->_mat(in_sig, j) = g.get()[index] * x[in_sig];
             index++;
@@ -325,14 +320,14 @@ Tensor *NSST::Windowing(const float *x, int N, int L) {
 /// <returns>
 ///		C is the re - assembled block matrix
 /// </returns>
-Tensor &NSST::RecFromPol(const ArrayXXf &l, int n, const Tensor* gen) {
+Tensor &NSST::RecFromPol(const ArrayXXf &l, int n, const Tensor *gen) {
     Tensor matC;
     matC.Set(n, n).Create::Zero();
 
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
             matC._mat(static_cast<int>(gen[1]._mat(i, j) - 1), static_cast<int>(gen[0]._mat(i, j) - 1)) += l(i, j);
-            matC._mat(static_cast<int>(gen[3]._mat(i, j) - 1), static_cast<int>(gen[2]._mat(i, j) - 1)) += l((i + n), j);
+            matC._mat(static_cast<int>(gen[3]._mat(i, j) - 1), static_cast<int>(gen[2]._mat(i, j) - 1)) += l((i + n),j);
         }
     }
 
@@ -358,7 +353,7 @@ void NSST::ShearingFiltersMyer() {
     int size = 0;
     ArrayXXf temp;
     shearing_filters = new Tensor *[Conf::sp.dcompSize];
-    FFTWF<ForwEigen, BackEigen>* ifft2d;
+    FFTWF<ForwEigen, BackEigen> *ifft2d = nullptr;
 
     for (int t = 0; t < Conf::sp.dcompSize; ++t) {
 
@@ -366,12 +361,12 @@ void NSST::ShearingFiltersMyer() {
         std::unique_ptr<float> ones_(ONE(2 * Conf::sp.dsize[t]));
         std::unique_ptr<Tensor> wf(Windowing(ones_.get(), 2 * Conf::sp.dsize[t], pow(2, Conf::sp.dcomp[t])));
 
-        size = pow(2, Conf::sp.dcomp[t]);
+        size = static_cast<int>(pow(2, Conf::sp.dcomp[t]));
         shearing_filters[t] = new Tensor[size];
         Eigen::MatrixXf one = Eigen::MatrixXf::Constant(1, Conf::sp.dsize[t], 1);
         ifft2d = FFTWF_Wrapper::Eigen::_2D::Get(Conf::sp.dsize[t], Conf::sp.dsize[t]);
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size; ++i) {
             // w_s(:, : , k) = real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
             temp = wf.get()->_mat.block(0, i, wf.get()->_mat.rows(), 1).matrix() * one;
 
@@ -387,7 +382,6 @@ void NSST::ShearingFiltersMyer() {
             shearing_filters[t][i]._mat = fftshift(shearing_filters[t][i]._mat);        // real(fftshift(ifft2(fftshift(w_s(:, : , k)))))
 
             shearing_filters[t][i] /= sqrtf(Conf::sp.dsize[t]);             // real(fftshift(ifft2(fftshift(w_s(:, : , k))))). / sqrt(n1);
-
         }
 
         delete[] gen;
@@ -399,22 +393,16 @@ void NSST::ShearingFiltersMyer() {
 
 /// <summary>
 ///		This function computes the(local) nonsubsampled shearlet transform as given
-/// </summary>
-/// <param name="image">
-///		input image
-/// </param>
-/// <param name="shearParam">
-///		shear_parameters.dcomp - a vector such that.dcomp(i) indicates that the
+///
+///     shear_parameters.dcomp - a vector such that.dcomp(i) indicates that the
 /// 	ith decomposition level has 2 ^ decomp(i)
 /// 	directions.The length of the vector plus 1 is
 /// 	total the number of decompostions.
-/// </param>
-/// <param name="filters">
-///
-/// </param>
-/// <param name="shearFilterMyer"></param>
+/// </summary>
+/// <param name="image">
+///		input image
 /// <returns></returns>
-Cont *NSST::NsstDec1e(Tensor *image) {
+Cont *NSST::Dec(Tensor *image) {
     // Laplacian Pyramid decomposition	//NSLP //cok olceklilik
     // Katsayilara gore alt-goruntuler elde edilir.
 
@@ -424,15 +412,18 @@ Cont *NSST::NsstDec1e(Tensor *image) {
     Cont *dst = new Cont(level + 1);
     dst->_conts[0] = new Tensor(y->_conts[0]);
     ArrayXXf shear_f;
+    Tensor* temp = nullptr;
 
     int size = 0;
-    for (int i = 0; i < level; i++) {
+    for (int i = 0; i < level; ++i) {
         size = (int) pow(2, Conf::sp.dcomp[i]);    // goruntuye uygulanacak yon sayisi belirlenir.
         dst->Create_Cell(i + 1, size);
 
-        for (int k = 0; k < size; k++) {
+        for (int k = 0; k < size; ++k) {
             shear_f = shearing_filters[i][k]._mat * sqrt(Conf::sp.dsize[i]);
-            dst->_conts[i + 1][k] = *Conv2D(y->_conts[i + 1][0]._mat, shear_f, conv_type::same);     // Cok yonluluk
+            temp = Conv2D(y->_conts[i + 1][0]._mat, shear_f, conv_type::same);     // Cok yonluluk
+            temp->CopyTo(&(dst->_conts[i + 1][k]));
+            delete temp;
         }
         dst->_conts[i + 1]->_d = size;
     }
@@ -457,9 +448,7 @@ Cont *NSST::NsstDec1e(Tensor *image) {
 ///		y->[1..4] => HFC (High frequency coefficients) <=> (YFK)
 /// </returns>
 Cont *NSST::AtrousDec(Tensor *image, int level) {
-    // filters -> atrousfilters
     Tensor *y0, *y1, *sym, *upSample;
-
     float shift[2] = {1.0F, 1.0F};
 
     // NSLP - Non Subsampled Laplacian Pyramid
@@ -483,7 +472,7 @@ Cont *NSST::AtrousDec(Tensor *image, int level) {
 
     // Seviye 1'e inene kadar her alcak frekans katsayilarinin alcak ve yuksek katsayisi hesaplanir.
     // Yuksek frekansa katsayilari y[4..1] olarak tutulur.
-    for (int i = 1; i <= level - 1; i++) {
+    for (int i = 1; i <= level - 1; ++i) {
         shift[0] = shift[1] = 2.0F - powf(2.0F, float(i - 1));
         L = static_cast<int>(pow(2, i));
         I2L = I2 * L;
@@ -499,6 +488,7 @@ Cont *NSST::AtrousDec(Tensor *image, int level) {
         y1 = Atrousc(sym, atrous_filters->_conts[3], I2L);
         delete upSample;
         delete sym;
+        delete image;
 
         y->_conts[level - i] = y1;
         image = y0;
@@ -538,11 +528,12 @@ Tensor *NSST::Symext(const Tensor *x, const Tensor *h, const float *shift) {
     int rr = int(floorf(q / 2.0F)) - s2 + 1;
 
     ArrayXXf extended_fliplr(x->_h, x->_w + ss);
-    ArrayXXf yT(x->_h, extended_fliplr.cols() + p + s1 );
+    ArrayXXf yT(x->_h, extended_fliplr.cols() + p + s1);
 
     // [fliplr(x(:,1:ss)) x  x(:,n  :-1: n-p-s1+1)]
     extended_fliplr << x->_mat.block(0, 0, x->_h, ss).rowwise().reverse(), x->_mat;         // fliplr(x(:,1:ss))
-    yT << extended_fliplr, x->_mat.block(0, n - (p + s1), x->_h, p + s1).rowwise().reverse();  // x(:, n : -1 : n - p - s1 + 1)
+    yT << extended_fliplr, x->_mat.block(0, n - (p + s1), x->_h,
+                                         p + s1).rowwise().reverse();  // x(:, n : -1 : n - p - s1 + 1)
 
     ArrayXXf extended_flipud(yT.rows() + rr, yT.cols());
     ArrayXXf yT2(extended_flipud.rows() + q + s2, extended_flipud.cols());
@@ -610,7 +601,7 @@ Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::A
     Tensor *outArray = new Tensor();
     outArray->Set(O_SRowLength, O_SColLength).Create::Default();
     float *out_p = outArray->_mat.data();
-    const float* signal_p = signal->_mat.data(), * filter_p = filter->_mat.data();
+    const float *signal_p = signal->_mat.data(), *filter_p = filter->_mat.data();
 
     /* Convolution loop */
     for (n1 = 0; n1 < O_SRowLength; n1++) {
@@ -647,14 +638,14 @@ Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::A
 /// <returns>
 ///		the reconstructed image
 /// </returns>
-Tensor *NSST::NsstRec1(const Cont * __restrict dst) {
+Tensor *NSST::Rec(const Cont *__restrict dst) {
 
     // , const Cont* filters -> atrousfilter
     int level = dst->_cont_num - 1;
-    Cont* y = new Cont(level + 1);
+    Cont *y = new Cont(level + 1);
     y->_conts[0] = new Tensor(dst->_conts[0]);
 
-    for (int i = 1; i <= level; i++)
+    for (int i = 1; i <= level; ++i)
         y->_conts[i] = Sum_Axis3(dst->_conts[i]);
 
     Tensor *ret = AtrousRec(y);
@@ -667,29 +658,24 @@ Tensor *NSST::NsstRec1(const Cont * __restrict dst) {
 /// <summary>
 ///		SATROUSREC - computes the inverse of 2 - D atrous decomposition computed with ATROUSDEC
 ///		y = satrousdrc(x, fname)
+///     lpfilt: can be any filter available in the function atrousfilters
 /// </summary>
 /// <param name="y : ">
 ///		image
 /// </param>
 /// <param name="lpfilt : ">
-///		 can be any filter available in the function atrousfilters
+///
 ///	</param>
 /// <returns>
 ///		x : reconstructed image
 /// </returns>
 Tensor *NSST::AtrousRec(const Cont *y) {
 
-    int NLevels = y->_cont_num - 1;
-
-    // [g0, h0, g1, h1] = atrousfilters(fname);
-    //Cont* ret = AtrousFilters(lpfilt);
-
+    int NLevels = (y->_cont_num - 1), L;
     Tensor *x = new Tensor, *temp_p, temp;
     y->_conts[0]->CopyTo(x);
 
-    Eigen::Array<float, 2, 2, Eigen::RowMajor> I2, I2L;
-    I2 << 1, 1, 1, 1;
-    int L;
+    Eigen::Array<float, 2, 2, Eigen::RowMajor> I2 {{1.0F, 1.0F},{1.0F, 1.0F}}, I2L;
 
     float shift[2] = {1.0F, 1.0F};
     Tensor *up, *sym, *atrousc1, *atrousc2;
@@ -697,8 +683,7 @@ Tensor *NSST::AtrousRec(const Cont *y) {
 
     for (int i = NLevels - 1; i >= 1; i--) {
 
-        shift[0] = -1 * pow(2, (i - 1)) + 2.0F;
-        shift[1] = -1 * pow(2, (i - 1)) + 2.0F;
+        shift[0] = shift[1] = 2.0F - powf(2.0F, static_cast<float>(i - 1));
 
         L = static_cast<int>(pow(2, i));
         I2L = I2 * L;
@@ -724,8 +709,7 @@ Tensor *NSST::AtrousRec(const Cont *y) {
         delete atrousc2;
     }
 
-    shift[0] = 1.0F;
-    shift[1] = 1.0F;
+    shift[0] = shift[1] = 1.0F;
 
     std::unique_ptr<Tensor> symetxX(Symext(temp_p, atrous_filters->_conts[0], shift));
     std::unique_ptr<Tensor> symetxY(Symext(y->_conts[NLevels], atrous_filters->_conts[2], shift));

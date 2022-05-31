@@ -23,8 +23,8 @@ public:
 
     Tensor(){}
 
-    Tensor(Tensor* in){
-        in->CopyTo(this);
+    Tensor(Tensor* clone){
+        clone->CopyTo(this);
     }
 
     Create& Set(int h, int w, int d = 1){
@@ -36,7 +36,7 @@ public:
 
     void CopyTo(Tensor* tensor){
         tensor->Set(_h, _w, _d);
-        if (nullptr == tensor->_mat.data())
+        if (tensor->_mat.data() == nullptr)
             Create::Default();
         tensor->_mat = this->_mat;
     }

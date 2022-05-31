@@ -9,13 +9,12 @@
 
 int main()
 {
-    long size, bmp_offset;
-    int width, height;
-    BYTE* image = nullptr;
+    ImgBMP img;
     NSST nsst;
 
     // LoadBMP can read only 24 bit image depth
-    image = LoadBMP(width, height, size, static_cast<LPCTSTR>(Conf::image_path));
+    img.LoadImage(Conf::image_path);
+    int width = (int)img.info_header_data.biWidth, height = (int)img.info_header_data.biHeight;
 
     // Low and High Frequences Coefficients -- 2D Laplacian Pyramid filters
     nsst.AtrousFilters();      // filters is in NSST
@@ -26,18 +25,18 @@ int main()
 
     nsst.ShearingFiltersMyer();
 
-    if (image)
+    if (img.bmp_p)
     {
         // Intensity image form
-        float* intensity = ConvertBMPToIntensity(image, width, height);
+        img.BMP2Intensity();
 
         Tensor i_image;
         i_image.Set(height, width);
-        i_image._mat = Eigen::Map<Eigen::Array<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(intensity, height, width);                        // I => Intensity
+        i_image._mat = Eigen::Map<Eigen::Array<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>>(img.intensity_p, height, width);
 
 
         // NSST - Non Subsampled Shearlet Transform
-        Cont* dst = nsst.NsstDec1e(&i_image);
+        Cont* dst = nsst.Dec(&i_image);
         //	INFO
         //  dst->_conts[_cont_num][_cont_depth]
         //  dst->_conts[0][0]			=> AFK is 1 piece and deep	 => 1
@@ -45,18 +44,16 @@ int main()
 
 
         // Inverse NSST
-        Tensor* inverse = nsst.NsstRec1(dst);
+        Tensor* inverse = nsst.Rec(dst);
 
 
-        // save Inverse NSST result
-        BYTE* inverse_bmp = ConvertIntensityToBMP(inverse->_mat, bmp_offset);
-        SaveBMP(inverse_bmp, inverse->_w, inverse->_h,bmp_offset, static_cast<LPCTSTR>(Conf::save_image_path));
+        // Inverse NSST result are saved
+        img.Intensity2BMP(inverse->_mat.data());
+        img.SaveImage(Conf::save_image_path);
 
-        delete inverse_bmp;
+        //delete inverse_bmp;
         delete dst;
         delete inverse;
-        delete intensity;
-        delete image;
     }
 
     return 0;
