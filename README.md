@@ -76,7 +76,7 @@ cmake ..
 make
 ```
 
-**Note**: If you want to see the Eigen array values during debug, you can copy the **.gbinit** file to ***/home/<user-name>/***
+**Note**: If you want to see the Eigen array values during debug, you can copy the **.gbinit** file to ***/home/user-name/***
 
 ## Dependencies
 ***Don't worry, no setup needed !***
