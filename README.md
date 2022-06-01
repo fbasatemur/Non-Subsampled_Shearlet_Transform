@@ -1,5 +1,8 @@
 # Non-Subsampled_Shearlet_Transform
 
+[<img src="https://img.shields.io/badge/FFTW-3.3.5-76B900?style=for-the-badge" style="vertical-align:top margin:6px 4px">](http://www.fftw.org/install/windows.html)
+
+
 ## What is NSST ?
 NSST is a discrete form of Shearlet transform, and it differs from other multi-scale transformations by avoiding up-down samplers. NSST consists of two main stages, multi-scale and multi-directional separations.
 
@@ -35,7 +38,7 @@ The process steps performed to obtain the NSST coefficients of an image of NxN s
   </li>
 </ol>
 
-## Generally Design
+## Pipeline
 
 ![image 1](https://github.com/fbasatemur/Non-Subsampled_Shearlet_Transform/blob/main/screenshots/NSST_Design.jpg)
 
@@ -49,11 +52,37 @@ The process steps performed to obtain the NSST coefficients of an image of NxN s
   </li>
 </ol>
 
-You can get the input Intensity image using TNSST (Inverse NSST). You can use **NsstRec1()** for this process. 
+You can get the input Intensity image using TNSST (Inverse NSST). You can use **NsstRec1()** for this process.
 
-![image 2](https://github.com/fbasatemur/Non-Subsampled_Shearlet_Transform/blob/main/screenshots/ss1.jpg)
 
-# Thanks !
+## Run
+
+### ***Windows:***
+```shell
+mkdir build && cd build
+copy ..\external_lib\fftw-3.3.5-dll64\libfftw3f-3.dll .
+cmake ..
+make
+```
+
+***Or run with Clion***  
+**Note**: A copy of ***external_lib/fftw-3.3.5-dll64/libfftw3f-3.dll*** must be in the executable directory
+
+### ***Ubuntu:***
+```shell
+mkdir build && cd build
+cmake ..
+make
+```
+
+**Note**: If you want to see the Eigen array values during debug, you can copy the **.gbinit** file to ***/home/<user-name>/***
+
+## Dependencies
+***Don't worry, no setup needed !***
+- Eigen 3.4.0
+- FFTW 3.3.5
+
+## Thanks !
 <ul>
   <li>
     <h2><a href="https://scholar.google.com/citations?hl=tr&user=Mq8UBzQAAAAJ" target="_blank">Assoc. Prof. Hülya Doğan</a></h2>
