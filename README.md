@@ -71,6 +71,7 @@ make
 ### ***Ubuntu:***
 ```shell
 mkdir build && cd build
+cp ../external_lib/fftw-3.3.5/libfftw3f.a ../external_lib/fftw-3.3.5/libfftw3f.la .
 cmake ..
 make
 ```
