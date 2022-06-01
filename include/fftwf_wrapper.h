@@ -30,7 +30,7 @@ public:
         float *imag_p = imag->data();
         int _size = rows * cols;
 
-        for (int i = 0; i < _size; i++) {
+        for (int i = 0; i < _size; ++i) {
             real_p[i] = out[i][REAL];
             imag_p[i] = out[i][IMAG];
         }

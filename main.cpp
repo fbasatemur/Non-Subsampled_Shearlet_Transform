@@ -51,7 +51,6 @@ int main()
         img.Intensity2BMP(inverse->_mat.data());
         img.SaveImage(Conf::save_image_path);
 
-        //delete inverse_bmp;
         delete dst;
         delete inverse;
     }

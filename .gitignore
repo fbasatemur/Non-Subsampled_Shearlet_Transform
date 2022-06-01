@@ -22,3 +22,6 @@
 
 # Idea
 .idea
+cmake-build-debug-mingw/
+cmake-build-release-mingw/
+cmake-build-wsl_debug/

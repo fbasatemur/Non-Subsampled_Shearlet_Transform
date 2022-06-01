@@ -128,7 +128,7 @@ void ImgBMP::Intensity2BMP(const float* intensity) {
 
     long bufpos = 0;
     for (int i = 0; i < info_header_data.biWidth * info_header_data.biHeight; ++i, bufpos+=3){
-            bmp_p[bufpos] = bmp_p[bufpos + 1] = bmp_p[bufpos + 2] = intensity[i];
+            bmp_p[bufpos] = bmp_p[bufpos + 1] = bmp_p[bufpos + 2] = static_cast<uint8_t>(intensity[i]);
     }
 }
 

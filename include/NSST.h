@@ -139,7 +139,7 @@ public:
     ///		2D result of convolution with filter upsampled by a m, only the 'valid' part is returned. <para></para>
     ///		Similar to conv2(x, h, 'valid'), where h is the upsampled filter.
     /// </returns>
-    Tensor *Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::Array22f &upMatrix);
+    Tensor *Atrousc(const Tensor *signal, const Tensor *filter, int upsampling_factor);
 
     /// <summary>
     ///		This function performs the inverse(local) nonsubsampled shearlet transform as given
@@ -204,7 +204,7 @@ private:
         float a1 = d1, a2 = d2;
         float* y = ZERO(N);
 
-        for (int i = 0; i <= n1; i++)
+        for (int i = 0; i <= n1; ++i)
             y[i] = a1 + i * (a2 - a1) / n1;
 
         y[0] = a1; y[n1] = a2;
@@ -213,7 +213,7 @@ private:
     }
 
     inline Tensor *Upsample2df(const Tensor *h, int power) {
-        int scale_k = pow(2, power);
+        int scale_k = pow(2.0, static_cast<double>(power));
         int height = scale_k * h->_h, width = scale_k * h->_w;
 
         Tensor *ho = new Tensor();
@@ -273,8 +273,8 @@ private:
         int iImage, iKernel, jImage, jKernel, jKernelTemp, jImageTemp;
         float sum;
 
-        for (int i = 0; i < outRow; i++) {
-            for (int j = 0; j < outCol; j++)
+        for (int i = 0; i < outRow; ++i) {
+            for (int j = 0; j < outCol; ++j)
             {
                 sum = 0.0F;
                 iKernel = kernel_h - 1 - max(0, edgeRows - i);
@@ -297,7 +297,7 @@ private:
         Tensor *ret = new Tensor;
         ret->Set(tensor->_h, tensor->_w).Create::Zero();
 
-        for (int d = 0; d < tensor->_d; d++)
+        for (int d = 0; d < tensor->_d; ++d)
             ret->_mat += tensor[d]._mat;
 
         return ret;

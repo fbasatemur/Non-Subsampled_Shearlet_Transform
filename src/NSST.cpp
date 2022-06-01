@@ -283,12 +283,11 @@ Tensor *NSST::Windowing(const float *x, int N, int L) {
     y->Set(N, L).Create::Zero();
 
     float T = N / L;
-    std::unique_ptr<float> g(ZERO(2 * T));
+    int n = static_cast<int>(2.0F * T);
+    std::unique_ptr<float> g(ZERO(n));
 
-    float n = 0;
-    for (int j = 0; j < 2 * T; ++j) {
-        n = -1.0F * T / 2.0F + j;
-        g.get()[j] = MeyerWind(n / T);
+    for (int j = 0; j < n; ++j) {
+        g.get()[j] = MeyerWind(static_cast<float>(j) / T - 0.5F);
     }
 
     int index = 0, in_sig = 0;
@@ -297,7 +296,7 @@ Tensor *NSST::Windowing(const float *x, int N, int L) {
         for (int k = -1 * T / 2; k <= 1.5 * T - 1; ++k) {
             in_sig = floor(Realmod(static_cast<int>(k + j * T), N));
             y->_mat(in_sig, j) = g.get()[index] * x[in_sig];
-            index++;
+            ++index;
         }
     }
 
@@ -466,26 +465,23 @@ Cont *NSST::AtrousDec(Tensor *image, int level) {
     y->_conts[level] = y1;
     image = y0;
 
-    Eigen::Array<float, 2, 2> I2, I2L;
-    I2 << 1, 1, 1, 1;
-    int L;
+    int upsampling_factor;
 
     // Seviye 1'e inene kadar her alcak frekans katsayilarinin alcak ve yuksek katsayisi hesaplanir.
     // Yuksek frekansa katsayilari y[4..1] olarak tutulur.
     for (int i = 1; i <= level - 1; ++i) {
         shift[0] = shift[1] = 2.0F - powf(2.0F, float(i - 1));
-        L = static_cast<int>(pow(2, i));
-        I2L = I2 * L;
+        upsampling_factor = static_cast<int>(pow(2, i));
 
         upSample = Upsample2df(atrous_filters->_conts[1], i);
         sym = Symext(image, upSample, shift);
-        y0 = Atrousc(sym, atrous_filters->_conts[1], I2L);
+        y0 = Atrousc(sym, atrous_filters->_conts[1], upsampling_factor);
         delete upSample;
         delete sym;
 
         upSample = Upsample2df(atrous_filters->_conts[3], i);
         sym = Symext(image, upSample, shift);
-        y1 = Atrousc(sym, atrous_filters->_conts[3], I2L);
+        y1 = Atrousc(sym, atrous_filters->_conts[3], upsampling_factor);
         delete upSample;
         delete sym;
         delete image;
@@ -569,7 +565,7 @@ Tensor *NSST::Symext(const Tensor *x, const Tensor *h, const float *shift) {
 ///		2D result of convolution with filter upsampled by a m, only the 'valid' part is returned. <para></para>
 ///		Similar to conv2(x, h, 'valid'), where h is the upsampled filter.
 /// </returns>
-Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::Array22f &upMatrix) {
+Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter,int upsampling_factor) {
     /*
         FArray   - Filter coefficients
         SArray   - Signal coefficients
@@ -580,7 +576,7 @@ Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::A
     int SFColLength, SFRowLength;
     int n1, n2, k1, k2, f1, f2, kk2, kk1;
     float sum, *M;
-    int M0, M3, sM0, sM3;
+    int M0, sM0;
 
     SColLength = signal->_w;
     SRowLength = signal->_h;
@@ -590,13 +586,11 @@ Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::A
     SFColLength = FColLength - 1;
     SFRowLength = FRowLength - 1;
 
-    M0 = static_cast<int>(upMatrix(0));
-    M3 = static_cast<int>(upMatrix(3));
+    M0 = upsampling_factor;
     sM0 = M0 - 1;
-    sM3 = M3 - 1;
 
     O_SColLength = SColLength - M0 * FColLength + 1;
-    O_SRowLength = SRowLength - M3 * FRowLength + 1;
+    O_SRowLength = SRowLength - M0 * FRowLength + 1;
 
     Tensor *outArray = new Tensor();
     outArray->Set(O_SRowLength, O_SColLength).Create::Default();
@@ -604,17 +598,17 @@ Tensor *NSST::Atrousc(const Tensor *signal, const Tensor *filter, const Eigen::A
     const float *signal_p = signal->_mat.data(), *filter_p = filter->_mat.data();
 
     /* Convolution loop */
-    for (n1 = 0; n1 < O_SRowLength; n1++) {
-        for (n2 = 0; n2 < O_SColLength; n2++) {
+    for (n1 = 0; n1 < O_SRowLength; ++n1) {
+        for (n2 = 0; n2 < O_SColLength; ++n2) {
             sum = 0;
             kk1 = n1 + sM0;
-            for (k1 = 0; k1 < FRowLength; k1++) {
-                kk2 = n2 + sM3;
-                for (k2 = 0; k2 < FColLength; k2++) {
+            for (k1 = 0; k1 < FRowLength; ++k1) {
+                kk2 = n2 + sM0;
+                for (k2 = 0; k2 < FColLength; ++k2) {
                     f1 = SFRowLength - k1;    /* flipped index */
                     f2 = SFColLength - k2;
                     sum += filter_p[f1 * FColLength + f2] * signal_p[kk1 * SColLength + kk2];
-                    kk2 += M3;
+                    kk2 += M0;
                 }
                 kk1 += M0;
             }
@@ -671,11 +665,9 @@ Tensor *NSST::Rec(const Cont *__restrict dst) {
 /// </returns>
 Tensor *NSST::AtrousRec(const Cont *y) {
 
-    int NLevels = (y->_cont_num - 1), L;
+    int NLevels = (y->_cont_num - 1), upsampling_factor;
     Tensor *x = new Tensor, *temp_p, temp;
     y->_conts[0]->CopyTo(x);
-
-    Eigen::Array<float, 2, 2, Eigen::RowMajor> I2 {{1.0F, 1.0F},{1.0F, 1.0F}}, I2L;
 
     float shift[2] = {1.0F, 1.0F};
     Tensor *up, *sym, *atrousc1, *atrousc2;
@@ -684,21 +676,19 @@ Tensor *NSST::AtrousRec(const Cont *y) {
     for (int i = NLevels - 1; i >= 1; i--) {
 
         shift[0] = shift[1] = 2.0F - powf(2.0F, static_cast<float>(i - 1));
-
-        L = static_cast<int>(pow(2, i));
-        I2L = I2 * L;
+        upsampling_factor = static_cast<int>(pow(2, i));
 
         // x = atrousc(Symext(x, upsample2df(g0, i), shift), g0, L * I2) + atrousc(Symext(y1, upsample2df(g1, i), shift), g1, L * I2);
 
         up = Upsample2df(atrous_filters->_conts[0], i);
         sym = Symext(temp_p, up, shift);
-        atrousc1 = Atrousc(sym, atrous_filters->_conts[0], I2L);
+        atrousc1 = Atrousc(sym, atrous_filters->_conts[0], upsampling_factor);
         delete up;
         delete sym;
 
         up = Upsample2df(atrous_filters->_conts[2], i);
         sym = Symext(y->_conts[NLevels - i], up, shift);
-        atrousc2 = Atrousc(sym, atrous_filters->_conts[2], I2L);
+        atrousc2 = Atrousc(sym, atrous_filters->_conts[2], upsampling_factor);
         delete up;
         delete sym;
 
