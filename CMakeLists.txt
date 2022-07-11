@@ -16,16 +16,22 @@ set(SOURCES
 include_directories(external_lib include)
 add_executable(${PROJECT_NAME} ${HEADERS} ${SOURCES})
 
+set(EXTERNAL_LIB_PATH
+	${PROJECT_SOURCE_DIR}/external_lib)
+	
+set(EIGEN_PATH
+	${EXTERNAL_LIB_PATH}/eigen-3.4.0)
+
 message("-- Linking FFTW3")
 
 if(WIN32)
-    target_include_directories(${PROJECT_NAME} PRIVATE "external_lib/fftw-3.3.5-dll64/" "external_lib/eigen-3.4.0/")
-    target_link_directories(${PROJECT_NAME} PRIVATE "external_lib/fftw-3.3.5-dll64/" "external_lib/eigen-3.4.0/")
+    target_include_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_LIB_PATH}/fftw-3.3.5-dll64" "${EIGEN_PATH}")
+    target_link_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_LIB_PATH}/fftw-3.3.5-dll64" "${EIGEN_PATH}")
     target_link_libraries(${PROJECT_NAME} PRIVATE libfftw3f-3)
 endif(WIN32)
 
 if(UNIX)
-    target_include_directories(${PROJECT_NAME} PRIVATE "/external_lib/fftw-3.3.5/" "external_lib/eigen-3.4.0/")
-    target_link_directories(${PROJECT_NAME} PRIVATE "/external_lib/fftw-3.3.5/" "external_lib/eigen-3.4.0/")
+    target_include_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_LIB_PATH}/fftw-3.3.5" "${EIGEN_PATH}")
+    target_link_directories(${PROJECT_NAME} PRIVATE "${EXTERNAL_LIB_PATH}/fftw-3.3.5" "${EIGEN_PATH}")
     target_link_libraries(${PROJECT_NAME} PRIVATE fftw3f)
 endif(UNIX)
