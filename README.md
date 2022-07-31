@@ -61,7 +61,7 @@ You can get the input Intensity image using TNSST (Inverse NSST). You can use **
 ```shell
 mkdir build && cd build
 copy ..\external_lib\fftw-3.3.5-dll64\libfftw3f-3.dll .
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
 
@@ -71,8 +71,7 @@ make
 ### ***Ubuntu:***
 ```shell
 mkdir build && cd build
-cp ../external_lib/fftw-3.3.5/libfftw3f.a ../external_lib/fftw-3.3.5/libfftw3f.la .
-cmake ..
+cmake -DCMAKE_BUILD_TYPE=Release ..
 make
 ```
 

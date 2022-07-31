@@ -235,60 +235,49 @@ private:
     // Input-Side convolution
     Tensor* Conv2D(const ArrayXXf& input, const ArrayXXf& kernel, conv_type type)
     {
-        int outRow, outCol, edgeRows, edgeCols;
+        int out_h, out_w, pad_h, pad_w;
         int input_h = input.rows(), input_w = input.cols();
         int kernel_h = kernel.rows(), kernel_w = kernel.cols();
 
         switch (type) {
             case conv_type::full:
-                outRow = input_h + kernel_h - 1;
-                outCol = input_w + kernel_h - 1;
-                edgeRows = kernel_h - 1;
-                edgeCols = kernel_w - 1;
+                out_h = input_h + kernel_h - 1;
+                out_w = input_w + kernel_w - 1;
+                pad_h = kernel_h + 1;
+                pad_w = kernel_w + 1;
                 break;
 
             case conv_type::same:
-                outRow = input_h;
-                outCol = input_w;
-                edgeRows = (kernel_h - 1) / 2;
-                edgeCols = (kernel_w - 1) / 2;
+                out_h = input_h;
+                out_w = input_w;
+                pad_h = kernel_h - 1;
+                pad_w = kernel_w - 1;
                 break;
 
             case conv_type::valid:
-                outRow = input_h - kernel_h + 1;
-                outCol = input_w - kernel_w + 1;
-                edgeRows = edgeCols = 0;
+                out_h = input_h - kernel_h + 1;
+                out_w = input_w - kernel_w + 1;
+                pad_h = pad_w = 0;
                 break;
 
             default:
                 exit(1);
         }
 
+        ArrayXXf padded_input = ArrayXXf::Zero(input_h + pad_h, input_w + pad_w);
+        padded_input.block(pad_h / 2, pad_w / 2, input_h, input_w) = input;
+
         Tensor* outMat = new Tensor;
-        outMat->Set(outRow, outCol).Default();
-        float* out_p = outMat->_mat.data();
-        const float* __restrict input_p = input.data();
-        const float* __restrict kernel_p = kernel.data();
+        outMat->Set(out_h, out_w).Default();
+        ArrayXXf kernel_rev = kernel.reverse();
 
-        int iImage, iKernel, jImage, jKernel, jKernelTemp, jImageTemp;
-        float sum;
-
-        for (int i = 0; i < outRow; ++i) {
-            for (int j = 0; j < outCol; ++j)
+        for (int i = 0; i < out_h; ++i) {
+            for (int j = 0; j < out_w; ++j)
             {
-                sum = 0.0F;
-                iKernel = kernel_h - 1 - max(0, edgeRows - i);
-                iImage = max(0, i - edgeRows);
-                jKernelTemp = kernel_w - 1 - max(0, edgeCols - j);
-                jImageTemp = max(0, j - edgeCols);
-
-                for (; (iKernel >= 0) && (iImage < input_h); iKernel--, iImage++)
-                    for (jKernel = jKernelTemp, jImage = jImageTemp; (jKernel >= 0) && (jImage < input_w); jKernel--, jImage++)
-                        sum += input_p[input_w * iImage + jImage] * kernel_p[kernel_w * iKernel + jKernel];
-
-                out_p[i * outCol + j] = sum;
+                outMat->_mat(i,j) = padded_input.block(i, j, kernel_h,kernel_w).cwiseProduct(kernel_rev).sum();
             }
         }
+
         return outMat;
     }
 
